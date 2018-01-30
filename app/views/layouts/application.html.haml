@@ -1,0 +1,13 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title MaxscaleTestVisualizer
+    = csrf_meta_tags
+    = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+
+    %link{ href: 'https://fonts.googleapis.com/css?family=Roboto:400,700', rel: 'stylesheet' }
+    %link{ href: 'https://fonts.googleapis.com/css?family=Roboto+Mono', rel: 'stylesheet' }
+  %body
+    = yield
