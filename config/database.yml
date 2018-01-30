@@ -1,8 +1,8 @@
 default: &default
   adapter: mysql2
-  database: mariadb
-  username: root
-  password: "0000"
+  database: test_results_db
+  username: test_bot
+  password: pass
   host: localhost
   encoding: utf8
   port: "3306"
