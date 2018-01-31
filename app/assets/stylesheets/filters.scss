@@ -1,3 +1,15 @@
-// Place all the styles related to the filters_controller controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+.modal-body-height {
+  max-height: 50vh;
+  overflow: auto;
+}
+
+#header-fixed {
+  position: fixed;
+  top: 0px; display:none;
+  background-color:white;
+}
+
+.simple-link {
+  padding: 0;
+  margin: 0;
+}

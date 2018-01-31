@@ -1,0 +1,80 @@
+.container
+  .row
+    %form{:action => filters_test_results_for_test_runs_path, :method => "get"}
+      .row
+        .col-3
+          .form-group
+            %label{:for => "mariadb_version_select"} MariaDB version
+            %select#mariadb_version_select.form-control{:multiple => "multiple", :name => "mariadb_version[]"}
+              %option{:value => "All", :selected => option_selected?("All", @filters_selects['mariadb_version'])} All
+              - @mariadb_versions.each do |mariadb_version|
+                %option{:value => mariadb_version.mariadb_version, :selected => option_selected?(mariadb_version.mariadb_version, @filters_selects['mariadb_version'])}
+                  = mariadb_version.mariadb_version
+        .col-3
+          .form-group
+            %label{:for => "maxscale_source_select"} Maxscale source
+            %select#maxscale_source_select.form-control{:multiple => "multiple", :name => "maxscale_source[]"}
+              %option{:value => "All", :selected => option_selected?("All", @filters_selects['maxscale_source'])} All
+              - @maxscale_sources.each do |maxscale_source|
+                %option{:value => maxscale_source.maxscale_source, :selected => option_selected?(maxscale_source.maxscale_source, @filters_selects['maxscale_source'])}
+                  = maxscale_source.maxscale_source
+        .col-3
+          .form-group
+            %label{:for => "box_select"} Box
+            %select#box_select.form-control{:multiple => "multiple", :name => "box[]"}
+              %option{:value => "All", :selected => option_selected?("All", @filters_selects['box'])} All
+              - @boxes.each do |box|
+                %option{:value => box.box, :selected => option_selected?(box.box, @filters_selects['box'])}
+                  = box.box
+        .col-3
+          .form-group
+            %label{:for => "jenkins_build_input"} Test run (Jenkins build id)
+            %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @filters_selects['jenkins_build']}
+          .form-group
+            %button.btn.btn-outline-dark.btn-block{:type => "button",  :'data-toggle' => "modal", :'data-target' => "#exampleModal"} Pick tests
+
+      / Modal
+      #exampleModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "exampleModalLabel", :role => "dialog", :tabindex => "-1"}
+        .modal-dialog.modal-dialog-centered{:role => "document"}
+          .modal-content
+            .modal-header
+              %h5#exampleModalLabel.modal-title Tests
+              %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+                %span{"aria-hidden" => "true"} ×
+            .modal-body.modal-body-height
+              - @tests.each_with_index do |test, index|
+                .form-check
+                  %input.form-check-input{id: "#{'test_name_check_' + index.to_s}", type: "checkbox", value: "", name: "tests_names[#{test.test}]", checked: @tests_names.include?(test.test)}
+                  %label.form-check-label{:for => "#{'test_name_check_' + index.to_s}"}
+                    = test.test
+            .modal-footer
+              %button#selectAllTestsBtn.btn.btn-link{:type => "button"} Select all
+              %button#unselectAllTestsBtn.btn.btn-link{:type => "button"} Unselect all
+              %button.btn.btn-primary{"data-dismiss" => "modal", :type => "button"} Save changes
+
+
+
+      .row
+        .col
+          %button.btn.btn-primary.btn-block{:type => "submit"} Submit
+
+  .row
+    %table#main-table.table.table-sm
+      %thead
+        %tr
+          %th{:scope => "col"} Test Name \ Tests Run
+          - @last_test_runs.each do |test_run|
+            %th{:scope => "col"}
+              %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
+                = test_run.jenkins_id
+      %tbody
+        - @tests_names.each do |test_name|
+          %tr
+            %th{:scope => "row"}
+              = test_name
+
+            - @last_test_runs.each do |test_run|
+              %td
+                = format_test_result @tests_results.result_for_test_and_test_run(test_name, test_run.id)
+    %table#header-fixed
+
