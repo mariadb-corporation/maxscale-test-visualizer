@@ -1,0 +1,12 @@
+database:
+  db_name: test_results_db
+  user: test_bot
+  password: pass
+  test_run_count_to_import: 20
+
+report_portal:
+  url: http://localhost:8080
+  project_name: testresults
+  auth_token: "8ee428b5-dcc5-4fba-8e4f-462863dbba15" # Get it from http://localhost:8080/ui/?#user-profile
+  repository_url: https://github.com/mariadb-corporation/MaxScale
+  logs_dir_url: http://max-tst-01.mariadb.com/LOGS
