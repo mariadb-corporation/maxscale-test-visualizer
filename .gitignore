@@ -1,13 +1,13 @@
 *.rbc
 capybara-*.html
 .rspec
-/log
-/tmp
-/db/*.sqlite3
-/db/*.sqlite3-journal
-/public/system
-/coverage/
-/spec/tmp
+/rails-app/log
+/rails-app/tmp
+/rails-app/db/*.sqlite3
+/rails-app/db/*.sqlite3-journal
+/rails-app/public/system
+/rails-app/coverage/
+/rails-app/spec/tmp
 *.orig
 rerun.txt
 pickle-email-*.html
@@ -24,8 +24,8 @@ config/initializers/secret_token.rb
 .env
 
 ## Environment normalization:
-/.bundle
-/vendor/bundle
+/rails-app/.bundle
+/rails-app/vendor/bundle
 
 # these should all be checked in to normalize the environment:
 # Gemfile.lock, .ruby-version, .ruby-gemset
@@ -34,7 +34,7 @@ config/initializers/secret_token.rb
 .rvmrc
 
 # if using bower-rails ignore default bower_components path bower.json files
-/vendor/assets/bower_components
+/rails-app/vendor/assets/bower_components
 *.bowerrc
 bower.json
 
