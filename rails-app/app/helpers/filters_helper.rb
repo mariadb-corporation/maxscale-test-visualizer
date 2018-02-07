@@ -1,4 +1,20 @@
 module FiltersHelper
+
+  REPOSITORY_URL = 'https://github.com/mariadb-corporation/MaxScale'.freeze
+  LOGS_DIR_URL = 'http://max-tst-01.mariadb.com/LOGS'.freeze
+
+  def commit_url(commit_id)
+    if commit_id.nil? || commit_id.strip.empty? || commit_id.length != 40
+      return '#'
+    end
+    "#{REPOSITORY_URL}/commit/#{commit_id}"
+  end
+
+  def logs_url(logs_dir)
+    return '#' if logs_dir.nil? || logs_dir.strip.empty?
+    "#{LOGS_DIR_URL}/#{logs_dir}"
+  end
+
   def format_test_result(test_result)
     return '' if test_result.nil?
 
@@ -32,11 +48,7 @@ module FiltersHelper
     "<b>Maxscale source:</b> #{test_run.maxscale_source} <br>"\
     "<b>Job name:</b> #{test_run.job_name} <br>"\
     "<b>CMake flags:</b> #{test_run.cmake_flags} <br>"\
-    "<b>Maxscale commit:</b> #{test_run.maxscale_commit_id} <br>"\
-  end
-
-  def logs_url(jenkins_id)
-    main_url = 'http://max-tst-01.mariadb.com/LOGS/'
-    main_url + 'run_test-' + jenkins_id.to_s
+    "<b>Maxscale commit:</b> <a href='#{commit_url(test_run.maxscale_commit_id)}'>#{test_run.maxscale_commit_id}</a> <br>"\
+    "<b>Logs:</b> <a href='#{logs_url(test_run.logs_dir)}'>#{test_run.logs_dir}</a> <br>"\
   end
 end
