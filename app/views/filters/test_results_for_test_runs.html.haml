@@ -1,80 +1,109 @@
-.container
-  .row
-    %form{:action => filters_test_results_for_test_runs_path, :method => "get"}
+.container-fluid
+  .row.justify-content-center
+    .col-sm-12.col-md-10.col-8
       .row
-        .col-3
-          .form-group
-            %label{:for => "mariadb_version_select"} MariaDB version
-            %select#mariadb_version_select.form-control{:multiple => "multiple", :name => "mariadb_version[]"}
-              %option{:value => "All", :selected => option_selected?("All", @filters_selects['mariadb_version'])} All
-              - @mariadb_versions.each do |mariadb_version|
-                %option{:value => mariadb_version.mariadb_version, :selected => option_selected?(mariadb_version.mariadb_version, @filters_selects['mariadb_version'])}
-                  = mariadb_version.mariadb_version
-        .col-3
-          .form-group
-            %label{:for => "maxscale_source_select"} Maxscale source
-            %select#maxscale_source_select.form-control{:multiple => "multiple", :name => "maxscale_source[]"}
-              %option{:value => "All", :selected => option_selected?("All", @filters_selects['maxscale_source'])} All
-              - @maxscale_sources.each do |maxscale_source|
-                %option{:value => maxscale_source.maxscale_source, :selected => option_selected?(maxscale_source.maxscale_source, @filters_selects['maxscale_source'])}
-                  = maxscale_source.maxscale_source
-        .col-3
-          .form-group
-            %label{:for => "box_select"} Box
-            %select#box_select.form-control{:multiple => "multiple", :name => "box[]"}
-              %option{:value => "All", :selected => option_selected?("All", @filters_selects['box'])} All
-              - @boxes.each do |box|
-                %option{:value => box.box, :selected => option_selected?(box.box, @filters_selects['box'])}
-                  = box.box
-        .col-3
-          .form-group
-            %label{:for => "jenkins_build_input"} Test run (Jenkins build id)
-            %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @filters_selects['jenkins_build']}
-          .form-group
-            %button.btn.btn-outline-dark.btn-block{:type => "button",  :'data-toggle' => "modal", :'data-target' => "#exampleModal"} Pick tests
+        .card.width-100
+          .card-body
+            %form.width-100{:action => filters_test_results_for_test_runs_path, :method => "get"}
+              .row
+                .col
+                  .form-group.row
+                    .col-3
+                      %label{:for => "mariadb_version_select"} MariaDB version
+                    .col
+                      %select#mariadb_version_select.form-control{:multiple => "multiple", :name => "mariadb_version[]"}
+                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:mariadb_version])} All
+                        - @mariadb_version_options.each do |mariadb_version|
+                          %option{:value => mariadb_version.mariadb_version, :selected => option_selected?(mariadb_version.mariadb_version, @selected_filters_values[:mariadb_version])}
+                            = mariadb_version.mariadb_version
+                  .form-group.row
+                    .col-3
+                      %label{:for => "maxscale_source_select"} Maxscale source
+                    .col
+                      %select#maxscale_source_select.form-control{:multiple => "multiple", :name => "maxscale_source[]"}
+                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:maxscale_source])} All
+                        - @maxscale_source_options.each do |maxscale_source|
+                          %option{:value => maxscale_source.maxscale_source, :selected => option_selected?(maxscale_source.maxscale_source, @selected_filters_values[:maxscale_source])}
+                            = maxscale_source.maxscale_source
+                  .form-group.row
+                    .col-3
+                      %label{:for => "box_select"} Box
+                    .col
+                      %select#box_select.form-control{:multiple => "multiple", :name => "box[]"}
+                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:box])} All
+                        - @box_options.each do |box|
+                          %option{:value => box.box, :selected => option_selected?(box.box, @selected_filters_values[:box])}
+                            = box.box
+                  .form-group.row
+                    .col-3
+                      %label{:for => "jenkins_build_input"} Test run (Jenkins build id)
+                    .col
+                      %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @selected_filters_values[:jenkins_build]}
 
-      / Modal
-      #exampleModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "exampleModalLabel", :role => "dialog", :tabindex => "-1"}
-        .modal-dialog.modal-dialog-centered{:role => "document"}
-          .modal-content
-            .modal-header
-              %h5#exampleModalLabel.modal-title Tests
-              %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
-                %span{"aria-hidden" => "true"} ×
-            .modal-body.modal-body-height
-              - @tests.each_with_index do |test, index|
-                .form-check
-                  %input.form-check-input{id: "#{'test_name_check_' + index.to_s}", type: "checkbox", value: "", name: "tests_names[#{test.test}]", checked: @tests_names.include?(test.test)}
-                  %label.form-check-label{:for => "#{'test_name_check_' + index.to_s}"}
-                    = test.test
-            .modal-footer
-              %button#selectAllTestsBtn.btn.btn-link{:type => "button"} Select all
-              %button#unselectAllTestsBtn.btn.btn-link{:type => "button"} Unselect all
-              %button.btn.btn-primary{"data-dismiss" => "modal", :type => "button"} Save changes
+                .col
+                  .form-check
+                    %input.form-check-input{id: "use_sql_query_check", type: "checkbox", value: "true", name: "use_sql_query", checked: !@selected_filters_values[:use_sql_query].nil?}
+                    %label.form-check-label{:for => "use_sql_query_check"} Use SQL query
+
+                  = render 'layouts/flashes'
+                  .form-group
+                    %span.input-group-text.align-items-start.justify-content-between
+                      SELECT * FROM test_run WHERE
+                      %button.btn.btn-sm.btn-link{"data-target" => "#sqlQueryHelpModal", "data-toggle" => "modal", :type => "button"}
+                        = ion_icon('help-circled')
+                    %textarea#sql_query_textarea.form-control{:rows => "4", :type => "text", :name => "sql_query"}
+                      = @selected_filters_values[:sql_query]
 
 
+              .row.align-items-center
+                .col
+                  .form-group.mb-0
+                    %button#selectTestsButton.btn.btn-outline-dark.btn-block{:type => "button",  :'data-toggle' => "modal", :'data-target' => "#selectTestsModal"} Select tests
+                .col
+                  .form-check
+                    %input.form-check-input{id: "hide_passed_tests_check", type: "checkbox", value: "true", name: "hide_passed_tests", checked: !@selected_filters_values[:hide_passed_tests].nil?}
+                    %label.form-check-label{:for => "hide_passed_tests_check"} Hide the passed tests
+                .col
+                  %button.btn.btn-primary.btn-block{:type => "submit"} Submit
+              = render 'select_tests_modal'
+              = render 'sql_query_help_modal'
 
+      .row.mt-3
+        .col-auto
+          = render 'table_pagination'
+        .col-auto
+          .form-group.row
+            %label.col-form-label{:for => "itemsPerPageCountSelect"} Items per page
+            .col
+              %select#itemsPerPageCountSelect.form-control.form-control{'data-items-per-page-count' => 10}
+                %option{value: 10} 10
+                %option{value: 20} 20
+                %option{value: 50} 50
+                %option{value: 75} 75
+                %option{value: 100} 100
+                %option{value: 250} 250
       .row
         .col
-          %button.btn.btn-primary.btn-block{:type => "submit"} Submit
+          .table-container
+            %table#main-table.table-bordered.table-hover.table.table-sm{pagination: "true", 'rows-count' => @tests_names.size}
+              %thead
+                %tr
+                  %th{:scope => "col"} Test Name \ Tests Run
+                  - @test_runs.each do |test_run|
+                    %th.text-center{:scope => "col"}
+                      %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
+                        = test_run.jenkins_id
+              %tbody
+                - @tests_names.each do |test_name|
+                  %tr
+                    %th{:scope => "row"}
+                      = test_name
 
-  .row
-    %table#main-table.table.table-sm
-      %thead
-        %tr
-          %th{:scope => "col"} Test Name \ Tests Run
-          - @last_test_runs.each do |test_run|
-            %th{:scope => "col"}
-              %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
-                = test_run.jenkins_id
-      %tbody
-        - @tests_names.each do |test_name|
-          %tr
-            %th{:scope => "row"}
-              = test_name
+                    - @test_runs.each do |test_run|
+                      %td.text-center
+                        %a{href: logs_url(test_run.jenkins_id), class: icon_color(@tests_results.result_for_test_and_test_run(test_name, test_run.id))}
+                          = ion_icon (format_test_result @tests_results.result_for_test_and_test_run(test_name, test_run.id))
+            %table.table-bordered.table-hover#header-fixed
 
-            - @last_test_runs.each do |test_run|
-              %td
-                = format_test_result @tests_results.result_for_test_and_test_run(test_name, test_run.id)
-    %table#header-fixed
+
 

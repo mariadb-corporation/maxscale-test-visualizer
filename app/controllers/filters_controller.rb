@@ -1,88 +1,100 @@
 class FiltersController < ApplicationController
+  rescue_from ActiveRecord::StatementInvalid, with: :sql_statement_invalid
+
+  add_flash_types :error
+
   DEFAULT_TEST_RUN_COUNT = 10
 
+  before_action :setup_selected_filters_values,
+                only: :test_results_for_test_runs
+
   def test_results_for_test_runs
+
+    @params = params
+
     # Values for the form elements
-    @mariadb_versions = TestRun.select('mariadb_version').group('mariadb_version')
-    @maxscale_sources = TestRun.select('maxscale_source').group('maxscale_source')
-    @boxes = TestRun.select('box').group('box')
-    @tests = Results.select('test').group('test')
+    @mariadb_version_options = TestRun.mariadb_version_values
+    @maxscale_source_options = TestRun.maxscale_source_values
+    @box_options = TestRun.box_values
+    @test_options = Result.test_names
 
-    # Filters
-    @filters_selects = Hash.new
-    @filters_selects['mariadb_version'] = params['mariadb_version']
-    @filters_selects['maxscale_source'] = params['maxscale_source']
-    @filters_selects['box'] = params['box']
-    @filters_selects['jenkins_build'] = params['jenkins_build']
-    @filters_selects['tests_names'] = params['tests_names']
-
-    # --------
-    if @filters_selects['jenkins_build'].nil? || (ranges_string_to_sql('jenkins_id', @filters_selects['jenkins_build']).empty?)
-      # Default
-      @last_test_runs = TestRun.order('start_time DESC').limit(DEFAULT_TEST_RUN_COUNT)
-      @last_test_runs = @last_test_runs.order('start_time')
+    if !@selected_filters_values[:use_sql_query].nil? && @selected_filters_values[:use_sql_query] == 'true'
+      @test_runs = TestRun.where(@selected_filters_values[:sql_query])
     else
-      # Filter by jenkins_id
-      @last_test_runs = TestRun.where(ranges_string_to_sql('jenkins_id', @filters_selects['jenkins_build']))
+      filter_test_runs
     end
 
+    @test_run_ids = @test_runs.map(&:id)
+    @tests_results = Result.where(id: @test_run_ids)
 
-    if !@filters_selects['mariadb_version'].nil? && !@filters_selects['mariadb_version'].include?('All')
-      @last_test_runs = @last_test_runs.where(mariadb_version: @filters_selects['mariadb_version'])
+    if @selected_filters_values[:tests_names].nil? || @selected_filters_values[:tests_names].empty?
+      @tests_names = @tests_results.select('test').group('test').map(&:test)
+    else
+      @tests_names = @selected_filters_values[:tests_names].keys
     end
 
-    if !@filters_selects['maxscale_source'].nil? && !@filters_selects['maxscale_source'].include?('All')
-      @last_test_runs = @last_test_runs.where(maxscale_source: @filters_selects['maxscale_source'])
-    end
-
-    if !@filters_selects['box'].nil? && !@filters_selects['box'].include?('All')
-      @last_test_runs = @last_test_runs.where(box: @filters_selects['box'])
-    end
-    # --------
-
-    # @last_test_runs = @last_test_runs.reverse
-
-    @test_run_ids = []
-    @last_test_runs.each { |test_run_item| @test_run_ids << test_run_item.id }
-    @tests_results = Results.where(id: @test_run_ids)
-
-    if @filters_selects['tests_names'].nil? || (!@filters_selects['tests_names'].nil? && @filters_selects['tests_names'].empty?)
-      @tests_names_query = @tests_results.select('test').group('test')
-      @tests_names = []
-      @tests_names_query.each do |test_name|
-        @tests_names << test_name.test
+    if !@selected_filters_values[:hide_passed_tests].nil? && @selected_filters_values[:hide_passed_tests] == 'true'
+      @tests_names.keep_if do |test_name|
+        @test_run_ids.any? do |test_run_id|
+          test_res = @tests_results.result_for_test_and_test_run(test_name, test_run_id)
+          !test_res.nil? && test_res.result == 1
+        end
       end
-    else
-      @tests_names = @filters_selects['tests_names']
     end
 
+    @test_runs = @test_runs.reverse if @need_reverse
   end
 
   private
 
-  def ranges_string_to_sql(field, ranges_string)
-    return '' if ranges_string.nil?
-
-    result = []
-    ranges = ranges_string.delete(' ').split(',')
-    return '' if ranges.nil? || ranges.empty?
-
-    ranges.each do |range|
-      if range.include?('-')
-        range_values = range.split('-')
-        if range_values.size == 2 && is_i?(range_values[0]) && is_i?(range_values[1])
-          left_value = [range_values[0].to_i, range_values[1].to_i].min
-          right_value = [range_values[0].to_i, range_values[1].to_i].max
-          result << " (#{field} BETWEEN '#{left_value}' AND '#{right_value}')"
-        end
-      elsif is_i?(range)
-        result << " (#{field} = #{range.to_i})"
-      end
-    end
-    result.join(' OR')
+  def setup_selected_filters_values
+    @selected_filters_values = {
+      mariadb_version: params['mariadb_version'],
+      maxscale_source: params['maxscale_source'],
+      box: params['box'],
+      jenkins_build: params['jenkins_build'],
+      tests_names: params['tests_names'],
+      hide_passed_tests: params['hide_passed_tests'],
+      use_sql_query: params['use_sql_query'],
+      sql_query: params['sql_query']
+    }
   end
 
-  def is_i?(str)
-    str.to_i.to_s == str
+  def filter_collection_by_field(collection, selected_filters_values, field, all_values_str)
+    if selected_filters_values[field].nil? ||
+       selected_filters_values[field].include?(all_values_str)
+      collection
+    else
+      collection.where(field => selected_filters_values[field])
+    end
+  end
+
+  def filter_test_runs
+    test_run_sql_range = ranges_string_to_sql('jenkins_id', @selected_filters_values[:jenkins_build])
+    if @selected_filters_values[:jenkins_build].nil? || test_run_sql_range.empty?
+      # Default
+      @test_runs = TestRun.order('start_time DESC').limit(DEFAULT_TEST_RUN_COUNT)
+      @need_reverse = true
+    else
+      # Filter by jenkins_id
+      @test_runs = TestRun.where(test_run_sql_range)
+    end
+
+    @test_runs = filter_collection_by_field(@test_runs,
+                                            @selected_filters_values,
+                                            :mariadb_version, 'All')
+    @test_runs = filter_collection_by_field(@test_runs,
+                                            @selected_filters_values,
+                                            :maxscale_source, 'All')
+    @test_runs = filter_collection_by_field(@test_runs,
+                                            @selected_filters_values,
+                                            :box, 'All')
+  end
+
+  def sql_statement_invalid
+    flash.now[:error] = "SQL query is invalid."
+    @tests_names = []
+    @test_runs = []
+    render :test_results_for_test_runs
   end
 end

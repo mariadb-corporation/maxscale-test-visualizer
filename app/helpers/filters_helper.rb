@@ -1,6 +1,21 @@
 module FiltersHelper
   def format_test_result(test_result)
-    test_result.nil? ? '' : test_result.result
+    return '' if test_result.nil?
+
+    if test_result.result == 1
+      'close'
+    else
+      'checkmark'
+    end
+  end
+
+  def icon_color(value)
+    return '' if value.nil?
+    if value.result == 0
+      'text-success'
+    else
+      'text-danger'
+    end
   end
 
   def option_selected?(option, filter_selects)
@@ -18,5 +33,10 @@ module FiltersHelper
     "<b>Job name:</b> #{test_run.job_name} <br>"\
     "<b>CMake flags:</b> #{test_run.cmake_flags} <br>"\
     "<b>Maxscale commit:</b> #{test_run.maxscale_commit_id} <br>"\
+  end
+
+  def logs_url(jenkins_id)
+    main_url = 'http://max-tst-01.mariadb.com/LOGS/'
+    main_url + 'run_test-' + jenkins_id.to_s
   end
 end

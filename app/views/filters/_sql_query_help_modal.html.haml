@@ -1,0 +1,51 @@
+#sqlQueryHelpModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "sqlQueryHelpModalTitle", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog.modal-lg.modal-dialog-centered{:role => "document"}
+    .modal-content
+      .modal-header
+        %h5#sqlQueryHelpModalTitle.modal-title Help
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+      .modal-body
+        %h2 Table: test_run
+        %table.table.table-sm
+          %thead
+            %tr
+              %th{:scope => "col"} Field
+              %th{:scope => "col"} Example value
+          %tbody
+            %tr
+              %th id
+              %td 152
+            %tr
+              %th jenkins_id
+              %td 2530
+            %tr
+              %th start_time
+              %td 2016-04-27 10:53:16
+            %tr
+              %th target
+              %td daily_all-517
+            %tr
+              %th box
+              %td centos_7_libvirt
+            %tr
+              %th product
+              %td mariadb
+            %tr
+              %th mariadb_version
+              %td 10.2
+            %tr
+              %th test_code_commit_id
+              %td eff88f7126df292ba50b2b8c3a6a25ed99f43e8d
+            %tr
+              %th maxscale_commit_id
+              %td e36e506f32f1b37e99ad090131145b59361a98b3
+            %tr
+              %th job_name
+              %td run_test
+            %tr
+              %th maxscale_source
+              %td 1.4
+            %tr
+              %th cmake_flags
+              %td -DBUILD_TESTS=Y -DCMAKE_BUILD_TYPE=Debug -DFAKE_CODE=Y -DBUILD_MMMON=Y -DBUILD_AVRO=Y -DBUILD_CDC=Y -DPACKAGE=Y -DDISTRIB_SUFFIX=.

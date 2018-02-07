@@ -1,0 +1,17 @@
+#selectTestsModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "selectTestsModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog.modal-dialog-centered{:role => "document"}
+    .modal-content
+      .modal-header
+        %h5#selectTestsModalLabel.modal-title Tests
+        %button#closeTestsModal.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+      #selectTestsModalBody.modal-body.modal-body-height
+        - @test_options.each_with_index do |test, index|
+          .form-check
+            %input.form-check-input{id: "#{'test_name_check_' + index.to_s}", type: "checkbox", value: "", name: "tests_names[#{test.test}]", checked: option_selected?((test.test), @selected_filters_values[:tests_names])}
+            %label.form-check-label{:for => "#{'test_name_check_' + index.to_s}"}
+              = test.test
+      .modal-footer
+        %button#selectAllTestsBtn.btn.btn-link{:type => "button"} Select all
+        %button#unselectAllTestsBtn.btn.btn-link{:type => "button"} Unselect all
+        %button#saveChangesTestsModal.btn.btn-primary{"data-dismiss" => "modal", :type => "button"} Save changes

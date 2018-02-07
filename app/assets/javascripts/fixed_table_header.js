@@ -1,29 +1,43 @@
+function tableOffsetY() {
+    return $("#main-table").offset().top;
+}
+
+function setHeaderCeilsWidth() {
+    $('#header-fixed').find('td, th').each(function(index)
+    {
+        var width = $("#main-table")[0].rows[0].cells[index].offsetWidth;
+        this.width = width;
+    });
+}
+
 $(document).ready(function () {
-    var tableOffset = $("#main-table").offset().top;
     var $header = $("#main-table > thead").clone();
     var $fixedHeader = $("#header-fixed").append($header);
 
     $(window).bind("scroll", function() {
         var offsetY = $(this).scrollTop();
 
-        if (offsetY >= tableOffset && $fixedHeader.is(":hidden")) {
+        if (offsetY >= tableOffsetY() && $fixedHeader.is(":hidden")) {
             $fixedHeader.show();
         }
-        else if (offsetY < tableOffset) {
+        else if (offsetY < tableOffsetY()) {
             $fixedHeader.hide();
         }
 
+        $("#header-fixed").css("width", $("#main-table").width());
+
+        setHeaderCeilsWidth();
+    });
+
+    $('.table-container').bind("scroll", function() {
         var offsetX = window.pageXOffset;
         $fixedHeader.css("left", -offsetX + $("#main-table").offset().left);
 
-        $("#header-fixed").css("width", $("#main-table").width());
+        setHeaderCeilsWidth();
     });
 
-    $header.find('td, th').each(function(index)
-    {
-        var width = $("#main-table")[0].rows[0].cells[index].offsetWidth
-        this.width = width;
-    });
+
+
 
     $(function () {
         $('[data-toggle="popover"]').popover({
