@@ -8,6 +8,7 @@ capybara-*.html
 /rails-app/public/system
 /rails-app/coverage/
 /rails-app/spec/tmp
+/rails-app/config/database.yml
 *.orig
 rerun.txt
 pickle-email-*.html
