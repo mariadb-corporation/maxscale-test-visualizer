@@ -5,11 +5,77 @@ class ReportPortal
 
   API_URL = 'api/v1'.freeze
   STANDARD_FILTER_TAG = 'STANDARD_FILTER'.freeze
+  STANDARD_DASHBOARD_TAG = 'STANDARD_DASHBOARD'.freeze
+  STANDARD_WIDGET_TAG = 'STANDARD_WIDGET'.freeze
 
   def initialize(host, project_name, bearer)
     @host = "#{host}/#{API_URL}"
     @project_name = project_name
     @bearer = bearer
+  end
+
+  def create_dashboard(name, description)
+    dashboard_id = get_dashboard_id_by_name(name)
+    if dashboard_id.nil?
+      url = "#{@host}/#{@project_name}/dashboard"
+      method = :post
+    else
+      url = "#{@host}/#{@project_name}/dashboard/#{dashboard_id}"
+      method = :put
+    end
+
+    response = make_response(
+      method, url,
+      'description' => add_standard_dashboard_tag(description),
+      'name' => name,
+      'share' => true
+    )
+    return dashboard_id unless dashboard_id.nil?
+    JSON.parse(response.body.to_s).to_hash['id']
+  end
+
+  def add_widget_to_dashboard(dashboard_id, widget_id)
+    url = "#{@host}/#{@project_name}/dashboard/#{dashboard_id}"
+    response = make_response(
+      :put, url,
+      'addWidget' => {
+        'widgetId' => widget_id,
+        'widgetPosition' => [
+          0
+        ],
+        'widgetSize' => [
+          0
+        ]
+      }
+    )
+    JSON.parse(response.body.to_s).to_hash['id']
+  end
+
+  def create_widget(name, description, type, gadget, filter_id, widget_id = nil)
+    if widget_id.nil?
+      url = "#{@host}/#{@project_name}/widget"
+      method = :post
+    else
+      url = "#{@host}/#{@project_name}/widget/#{widget_id}"
+      method = :put
+    end
+
+    response = make_response(
+      method, url,
+      'content_parameters' => {
+        'type' => type,
+        'gadget' => gadget,
+        'metadata_fields' => %w(name number start_time),
+        'itemsCount' => 50
+      },
+      'filter_id' => filter_id,
+      'description' => add_standard_widget_tag(description),
+      'name' => name,
+      'share' => true
+    )
+
+    return widget_id unless widget_id.nil?
+    JSON.parse(response.body.to_s).to_hash['id']
   end
 
   def create_project
@@ -165,6 +231,15 @@ class ReportPortal
     JSON.parse(response.body.to_s).first['id']
   end
 
+  def all_standard_filters
+    url = "#{@host}/#{@project_name}/filter"
+    response = make_get_response(url)
+    standard_filters = JSON.parse(response.body.to_s).to_h['content'].keep_if do |filter|
+      filter['description'].include?(STANDARD_FILTER_TAG)
+    end
+    standard_filters
+  end
+
   def delete_standard_filters
     url = "#{@host}/#{@project_name}/filter"
     response = make_get_response(url)
@@ -177,6 +252,41 @@ class ReportPortal
     standard_filters_ids.each { |filter_id| delete_filter(filter_id) }
   end
 
+  def get_dashboard_id_by_name(name)
+    url = "#{@host}/#{@project_name}/dashboard"
+    response = make_get_response(url)
+    dashboard_res = JSON.parse(response.body.to_s).find do |dashboard|
+      dashboard['name'] == name
+    end
+    return nil if dashboard_res.nil?
+    dashboard_res['id']
+  end
+
+  def standard_widget?(widget_id)
+    url = "#{@host}/#{@project_name}/widget/#{widget_id}"
+    response = make_get_response(url)
+    widget = JSON.parse(response.body.to_s)
+    return false if widget.nil? || widget.to_h['description'].nil?
+    widget.to_h['description'].include?(STANDARD_WIDGET_TAG)
+  end
+
+  def delete_widget_from_dashboard(dashboard_id, widget_id)
+    url = "#{@host}/#{@project_name}/dashboard/#{dashboard_id}"
+    make_response(:put, url, 'deleteWidget' => widget_id)
+  end
+
+  def delete_standard_widgets_from_dashboard(dashboard_id)
+    url = "#{@host}/#{@project_name}/dashboard/#{dashboard_id}"
+    response = make_get_response(url)
+    widgets = JSON.parse(response.body.to_s).to_h['widgets']
+    return if widgets.nil?
+    widgets.each do |widget|
+      if standard_widget?(widget['widgetId'])
+        delete_widget_from_dashboard(dashboard_id, widget['widgetId'])
+      end
+    end
+  end
+
   def delete_filter(filter_id)
     url = "#{@host}/#{@project_name}/filter/#{filter_id}"
     make_response(:delete, url)
@@ -186,6 +296,14 @@ class ReportPortal
 
   def add_standard_filter_tag(description)
     "#{description}\n\n#{STANDARD_FILTER_TAG}"
+  end
+
+  def add_standard_dashboard_tag(description)
+    "#{description}\n\n#{STANDARD_DASHBOARD_TAG}"
+  end
+
+  def add_standard_widget_tag(description)
+    "#{description}\n\n#{STANDARD_WIDGET_TAG}"
   end
 
   def make_response(method, url, body = {})
