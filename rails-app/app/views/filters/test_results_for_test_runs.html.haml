@@ -113,7 +113,3 @@
                         %a{href: test_logs_url(test_run.logs_dir, test_name), class: icon_color(@tests_results.result_for_test_and_test_run(test_name, test_run.id))}
                           = ion_icon (format_test_result @tests_results.result_for_test_and_test_run(test_name, test_run.id))
             %table.table-bordered.table-hover#header-fixed
-
-= @params
-
-
