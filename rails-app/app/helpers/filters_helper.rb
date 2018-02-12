@@ -15,6 +15,11 @@ module FiltersHelper
     "#{LOGS_DIR_URL}/#{logs_dir}"
   end
 
+  def test_logs_url(logs_dir, test_name)
+    return '#' if logs_dir.nil? || logs_dir.strip.empty?
+    "#{LOGS_DIR_URL}/#{logs_dir}/LOGS/#{test_name}"
+  end
+
   def format_test_result(test_result)
     return '' if test_result.nil?
 

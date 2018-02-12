@@ -4,7 +4,7 @@
       .row
         .card.width-100
           .card-body
-            %form.width-100{:action => filters_test_results_for_test_runs_path, :method => "get"}
+            %form#filtersForm.width-100{:action => filters_test_results_for_test_runs_path, :method => "get"}
               .row
                 .col
                   .form-group.row
@@ -54,6 +54,11 @@
                     %textarea#sql_query_textarea.form-control{:rows => "4", :type => "text", :name => "sql_query"}
                       = @selected_filters_values[:sql_query]
 
+              / row with hidden fields (for pagination)
+              .row
+                %input#pageNum.form-control{:type => 'hidden', :name => "page_num", :value => @selected_filters_values[:page_num]}
+                %input#tableColumnsCount.form-control{:type => 'hidden', :name => "table_columns_count", :value => @selected_filters_values[:table_columns_count]}
+                %input#tablePagesCount.form-control{:type => 'hidden', :name => "table_pages_count", :value => @selected_filters_values[:table_pages_count]}
 
               .row.align-items-center
                 .col
@@ -64,7 +69,7 @@
                     %input.form-check-input{id: "hide_passed_tests_check", type: "checkbox", value: "true", name: "hide_passed_tests", checked: !@selected_filters_values[:hide_passed_tests].nil?}
                     %label.form-check-label{:for => "hide_passed_tests_check"} Hide the passed tests
                 .col
-                  %button.btn.btn-primary.btn-block{:type => "submit"} Submit
+                  %button#submitButton.btn.btn-primary.btn-block{:type => "submit"} Submit
               = render 'select_tests_modal'
               = render 'sql_query_help_modal'
 
@@ -75,24 +80,28 @@
           .form-group.row
             %label.col-form-label{:for => "itemsPerPageCountSelect"} Items per page
             .col
-              %select#itemsPerPageCountSelect.form-control.form-control{'data-items-per-page-count' => 10}
+              %select#itemsPerPageCountSelect.form-control.form-control{'data-items-per-page-count' => 5}
+                %option{value: 5} 5
                 %option{value: 10} 10
                 %option{value: 20} 20
-                %option{value: 50} 50
-                %option{value: 75} 75
-                %option{value: 100} 100
-                %option{value: 250} 250
+                %option{value: 30} 30
       .row
         .col
           .table-container
             %table#main-table.table-bordered.table-hover.table.table-sm{pagination: "true", 'rows-count' => @tests_names.size}
               %thead
                 %tr
-                  %th{:scope => "col"} Test Name \ Tests Run
+                  %th.v-align-middle{:scope => "col"} Test Name \ Tests Run
                   - @test_runs.each do |test_run|
-                    %th.text-center{:scope => "col"}
+                    %th.text-center.v-align-top{:scope => "col"}
                       %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
                         = test_run.jenkins_id
+                      .xx-small-font
+                        = test_run.maxscale_source
+                        %br
+                        = test_run.target
+                        %br
+                        = test_run.start_time.to_s.delete 'UTC'
               %tbody
                 - @tests_names.each do |test_name|
                   %tr
@@ -101,9 +110,10 @@
 
                     - @test_runs.each do |test_run|
                       %td.text-center
-                        %a{href: logs_url(test_run.logs_dir), class: icon_color(@tests_results.result_for_test_and_test_run(test_name, test_run.id))}
+                        %a{href: test_logs_url(test_run.logs_dir, test_name), class: icon_color(@tests_results.result_for_test_and_test_run(test_name, test_run.id))}
                           = ion_icon (format_test_result @tests_results.result_for_test_and_test_run(test_name, test_run.id))
             %table.table-bordered.table-hover#header-fixed
 
+= @params
 
 

@@ -1,62 +1,81 @@
-function goToPage(pageNum, pageSize) {
-    $("[pagination = true] tbody tr").each(function(index, object) {
-        if (index < (pageNum - 1) * pageSize || index >= (pageNum) * pageSize) {
-            $(object).hide();
-        } else {
-            $(object).show();
-        }
-    })
-    $("#currentPageLabel").attr("data-current-page", pageNum);
-    $("#currentPageLabel").text(pageNum);
+function setPageNumLabel() {
+    $("#currentPageLabel").text(currentPage());
+}
+
+function setPageNum(pageNum) {
+    $("#pageNum").val(pageNum);
+}
+
+function goToPage(pageNum) {
+    setPageNum(pageNum);
+    setPageNumLabel();
+    $("#filtersForm").submit();
 }
 
 function currentPage() {
-    return parseInt($("#currentPageLabel").attr("data-current-page"));
+    return parseInt($("#pageNum").val());
 }
 
 function pageSize() {
-    return parseInt($("#itemsPerPageCountSelect").attr("data-items-per-page-count"));
-}
-
-function rowsCount() {
-    return parseInt($("#main-table").attr("rows-count"));
+    return parseInt($("#tableColumnsCount").val());
 }
 
 function pagesCount() {
-    return Math.ceil(rowsCount() / pageSize());
+    return parseInt($("#tablePagesCount").val());
 }
 
 $(document).ready(function () {
     // To first page
     $("#firstTablePageButton").click(function() {
-        goToPage(1, pageSize());
+        goToPage(1);
     });
 
     // To previous page
     $("#previousTablePageButton").click(function() {
-        if(currentPage() - 1 > 0) {
-            goToPage(currentPage() - 1, pageSize());
+        if (currentPage() - 1 > 0) {
+            goToPage(currentPage() - 1);
         }
     });
 
     // To next page
     $("#nextTablePageButton").click(function() {
-        if(currentPage() + 1 <= pagesCount()) {
-            goToPage(currentPage() + 1, pageSize());
+        if (currentPage() + 1 <= pagesCount()) {
+            goToPage(currentPage() + 1);
         }
     });
 
     // To last page
     $("#lastTablePageButton").click(function() {
-        goToPage(pagesCount(), pageSize());
+        goToPage(pagesCount());
     });
 
-
+    // When select page size
     $("#itemsPerPageCountSelect").change(function() {
-        var newPageSize = parseInt($("#itemsPerPageCountSelect option:selected").val());
-        $("#itemsPerPageCountSelect").attr("data-items-per-page-count", newPageSize);
-        goToPage(1, newPageSize);
+        var newPageSize = $("#itemsPerPageCountSelect option:selected").val();
+
+        $("#tableColumnsCount").val(newPageSize);
+
+        setPageNum(-1);
+        $("#filtersForm").submit();
     });
 
-    goToPage(currentPage(), pageSize());
+    $("#submitButton").click(function() {
+        setPageNum(-1);
+    })
+
+
+    if (!currentPage()) {
+        setPageNum(pagesCount());
+    }
+
+    if (!pageSize()) {
+        $("#tableColumnsCount").val($("#itemsPerPageCountSelect").children().first().val());
+        $("#itemsPerPageCountSelect").val($("#itemsPerPageCountSelect").children().first().val());
+    }
+
+    $("#itemsPerPageCountSelect").val(pageSize());
+
+    setPageNum(currentPage());
+    setPageNumLabel();
+
 });

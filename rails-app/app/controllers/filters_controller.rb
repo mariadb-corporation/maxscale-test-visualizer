@@ -24,6 +24,8 @@ class FiltersController < ApplicationController
       filter_test_runs
     end
 
+    cut_test_runs_for_table_page
+
     @test_run_ids = @test_runs.map(&:id)
     @tests_results = Result.where(id: @test_run_ids)
 
@@ -41,8 +43,6 @@ class FiltersController < ApplicationController
         end
       end
     end
-
-    @test_runs = @test_runs.reverse if @need_reverse
   end
 
   private
@@ -56,8 +56,18 @@ class FiltersController < ApplicationController
       tests_names: params['tests_names'],
       hide_passed_tests: params['hide_passed_tests'],
       use_sql_query: params['use_sql_query'],
-      sql_query: params['sql_query']
+      sql_query: params['sql_query'],
+      page_num: params['page_num'].to_i,
+      table_columns_count: params['table_columns_count'].to_i,
     }
+
+    if @selected_filters_values[:page_num].zero?
+      @selected_filters_values[:page_num] = -1
+    end
+
+    if @selected_filters_values[:table_columns_count].zero?
+      @selected_filters_values[:table_columns_count] = 5
+    end
   end
 
   def filter_collection_by_field(collection, selected_filters_values, field, all_values_str)
@@ -73,8 +83,7 @@ class FiltersController < ApplicationController
     test_run_sql_range = ranges_string_to_sql('jenkins_id', @selected_filters_values[:jenkins_build])
     if @selected_filters_values[:jenkins_build].nil? || test_run_sql_range.empty?
       # Default
-      @test_runs = TestRun.order('start_time DESC').limit(DEFAULT_TEST_RUN_COUNT)
-      @need_reverse = true
+      @test_runs = TestRun.order('start_time')
     else
       # Filter by jenkins_id
       @test_runs = TestRun.where(test_run_sql_range)
@@ -89,6 +98,15 @@ class FiltersController < ApplicationController
     @test_runs = filter_collection_by_field(@test_runs,
                                             @selected_filters_values,
                                             :box, 'All')
+  end
+
+  def cut_test_runs_for_table_page
+    @selected_filters_values[:table_pages_count] = (@test_runs.count.to_f / @selected_filters_values[:table_columns_count].to_f).ceil
+    if @selected_filters_values[:page_num] == -1
+      @selected_filters_values[:page_num] = @selected_filters_values[:table_pages_count]
+    end
+
+    @test_runs = @test_runs.limit(@selected_filters_values[:table_columns_count]).offset((@selected_filters_values[:page_num] - 1) * @selected_filters_values[:table_columns_count])
   end
 
   def sql_statement_invalid
