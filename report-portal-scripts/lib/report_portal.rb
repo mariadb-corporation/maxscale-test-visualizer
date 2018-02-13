@@ -51,7 +51,7 @@ class ReportPortal
     JSON.parse(response.body.to_s).to_hash['id']
   end
 
-  def create_widget(name, description, type, gadget, filter_id, widget_id = nil)
+  def create_widget(name, description, type, gadget, filter_id, options = {}, content_fields = [], widget_id = nil)
     if widget_id.nil?
       url = "#{@host}/#{@project_name}/widget"
       method = :post
@@ -66,7 +66,9 @@ class ReportPortal
         'type' => type,
         'gadget' => gadget,
         'metadata_fields' => %w(name number start_time),
-        'itemsCount' => 50
+        'itemsCount' => 50,
+        'widgetOptions' => options,
+        'content_fields' => content_fields
       },
       'filter_id' => filter_id,
       'description' => add_standard_widget_tag(description),

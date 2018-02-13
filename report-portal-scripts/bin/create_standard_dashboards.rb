@@ -35,7 +35,15 @@ report_portal.all_standard_filters.each do |filter|
     'Shows the growth trend in the number of test cases with each selected statuses from run to run',
     'line_chart',
     'old_line_chart',
-    filter_id
+    filter_id,
+    {
+      'viewMode' => ['launchMode']
+    },
+    [
+      'statistics$executions$total',
+      'statistics$executions$passed',
+      'statistics$executions$failed'
+    ]
   )
 
   widgets << report_portal.create_widget(
@@ -43,7 +51,15 @@ report_portal.all_standard_filters.each do |filter|
     'Shows the growth trend in the number of test cases with each selected statuses from run to run',
     'trends_chart',
     'statistic_trend',
-    filter_id
+    filter_id,
+    {
+      'viewMode' => ['launchMode']
+    },
+    [
+      'statistics$executions$total',
+      'statistics$executions$passed',
+      'statistics$executions$failed'
+    ]
   )
 
   widgets << report_portal.create_widget(
@@ -51,7 +67,13 @@ report_portal.all_standard_filters.each do |filter|
     'Shows statistics of the last launch',
     'combine_pie_chart',
     'launch_statistics',
-    filter_id
+    filter_id,
+    {  },
+    [
+      'statistics$executions$total',
+      'statistics$executions$passed',
+      'statistics$executions$failed'
+    ]
   )
 
   widgets << report_portal.create_widget(
@@ -59,16 +81,32 @@ report_portal.all_standard_filters.each do |filter|
     'Shows the trend of growth in the number of failed test cases from run to run',
     'bug_trend',
     'bug_trend',
-    filter_id
+    filter_id,
+    { },
+    [
+      'statistics$executions$total',
+      'statistics$executions$passed',
+      'statistics$executions$failed'
+    ]
   )
 
-  widgets << report_portal.create_widget(
-    "Passing rate summary #{filter_name} (#{Time.now})",
-    'Shows the percentage ratio of Passed test cases to Total cases for set of launches',
-    'bar_chart',
-    'passing_rate_summary',
-    filter_id
-  )
+  # For some unknown reason it does not work
+  #
+  # widgets << report_portal.create_widget(
+  #   "Passing rate summary #{filter_name} (#{Time.now})",
+  #   'Shows the percentage ratio of Passed test cases to Total cases for set of launches',
+  #   'bar_chart',
+  #   'passing_rate_summary',
+  #   filter_id,
+  #   {
+  #     'viewMode' => ['pieChartMode']
+  #   },
+  #   [
+  #     'statistics$executions$total',
+  #     'statistics$executions$passed',
+  #     'statistics$executions$failed'
+  #   ]
+  # )
 
   widgets.each do |widget_id|
     report_portal.add_widget_to_dashboard(dashboard_id, widget_id)
