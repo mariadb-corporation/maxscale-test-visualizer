@@ -95,13 +95,13 @@
                   - @test_runs.each do |test_run|
                     %th.text-center.v-align-top{:scope => "col"}
                       %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
-                        = test_run.jenkins_id
+                        = test_run['jenkins_id']
                       .xx-small-font
-                        = test_run.maxscale_source
+                        = test_run['maxscale_source']
                         %br
-                        = test_run.target
+                        = test_run['target']
                         %br
-                        = test_run.start_time.to_s.delete 'UTC'
+                        = test_run['start_time'].to_s.delete 'UTC'
               %tbody
                 - @tests_names.each do |test_name|
                   %tr
@@ -110,6 +110,6 @@
 
                     - @test_runs.each do |test_run|
                       %td.text-center
-                        %a{href: test_logs_url(test_run.logs_dir, test_name), class: icon_color(@tests_results.result_for_test_and_test_run(test_name, test_run.id))}
-                          = ion_icon (format_test_result @tests_results.result_for_test_and_test_run(test_name, test_run.id))
+                        %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(test_result(@final_result, test_run, test_name))}
+                          = ion_icon (format_test_result test_result(@final_result, test_run, test_name))
             %table.table-bordered.table-hover#header-fixed
