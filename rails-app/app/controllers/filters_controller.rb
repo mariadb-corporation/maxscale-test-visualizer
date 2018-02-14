@@ -5,11 +5,22 @@ class FiltersController < ApplicationController
 
   DEFAULT_TEST_RUN_COUNT = 10
 
+  skip_before_action :verify_authenticity_token
   before_action :setup_selected_filters_values,
-                only: :test_results_for_test_runs
+                only: [:test_results_for_test_runs, :apply_filters]
 
   def test_results_for_test_runs
+    main_filter
+  end
 
+  def apply_filters
+    main_filter
+    render :test_results_for_test_runs
+  end
+
+  private
+
+  def main_filter
     @params = params
 
     # Values for the form elements
@@ -42,8 +53,6 @@ class FiltersController < ApplicationController
 
     @tests_names = @final_result.collect { |row| row['test'] }.uniq
   end
-
-  private
 
   def setup_selected_filters_values
     @selected_filters_values = {

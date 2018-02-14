@@ -1,12 +1,11 @@
 default: &default
   adapter: mysql2
   database: test_results_db
-  username: test_bot
-  password: pass
+  username: root
+  password: "0000"
   host: localhost
   encoding: utf8
   port: "3306"
-  socket: mysql
 
 development:
   <<: *default

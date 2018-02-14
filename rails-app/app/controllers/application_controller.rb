@@ -107,7 +107,7 @@ class ApplicationController < ActionController::Base
       "        ) as main_table_2 "\
       "      GROUP BY main_table_2.test "\
       "    ) as total_res_table using(test)) as main_table "\
-      "#{hide_passed_tests_filter};"
+      "#{hide_passed_tests_filter} ORDER BY test;"
 
     res
   end

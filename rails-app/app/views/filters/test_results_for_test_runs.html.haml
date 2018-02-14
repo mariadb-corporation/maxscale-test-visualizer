@@ -4,7 +4,7 @@
       .row
         .card.width-100
           .card-body
-            %form#filtersForm.width-100{:action => filters_test_results_for_test_runs_path, :method => "get"}
+            %form#filtersForm.width-100{:action => filter_path, :method => "post"}
               .row
                 .col
                   .form-group.row

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
-  get 'filters/test_results_for_test_runs'
+  get 'filter', to: 'filters#test_results_for_test_runs'
+  post 'filter', to: 'filters#apply_filters'
   root 'filters#test_results_for_test_runs'
 end
