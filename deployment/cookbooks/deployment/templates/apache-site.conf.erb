@@ -1,0 +1,15 @@
+<VirtualHost *:9291>
+    DocumentRoot <%= node['application_path'] %>public/
+    <Directory <%= node['application_path'] %>public/>
+        AllowOverride none
+        Require all granted
+    </Directory>
+
+    ProxyPass /favicon.ico !
+    ProxyPass /robots.txt !
+    ProxyPassMatch ^/(404|422|500).html$ !
+    ProxyPass /assets/ !
+
+    ProxyPass / http://127.0.0.1:9292/
+    ProxyPassReverse / http://127.0.0.1:9292/
+</VirtualHost>

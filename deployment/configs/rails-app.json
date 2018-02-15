@@ -1,0 +1,7 @@
+{
+  "name": "rails-app-server",
+  "description": "Install rails application on the server",
+  "run_list": [
+    "role[rails-app]"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "rails-app-server",
+  "description": "A role for deploying the server",
+  "default_attributes": {
+    "db": {
+      "username": "test_bot",
+      "password": "10ntQzJfrbE8CzssBMN1JRf3k"
+    },
+    "rails_secret": "dpRTfX0krzTO0nsEJF3lFZLGcrkC0qLA1sqtNiSFxrs4d3j6BEi20P7Jj8ncCKJE0WEA0DBvsh43F69Ord9agumKQFBssVSrDVhllLDLixGiMt3rKfLAzJa02qRta"
+  },
+  "json_class": "Chef::Role",
+  "chef_type": "role",
+  "run_list": [ "recipe[deployment::install]" ]
+}

@@ -1,0 +1,45 @@
+{
+  "name": "deployment",
+  "description": "Installs/Configures MaxScale Test Visualizer",
+  "long_description": "Installs/Configures the Rails MaxScale Test Visualizer",
+  "maintainer": "MariaDB",
+  "maintainer_email": "andrey.vasilyev@fruct.org",
+  "license": "MIT",
+  "platforms": {
+    "ubuntu": ">= 0.0.0"
+  },
+  "dependencies": {
+    "ruby_rbenv": ">= 0.0.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.1.0",
+  "source_url": "",
+  "issues_url": "",
+  "privacy": false,
+  "chef_versions": [
+    [
+      ">= 12.1"
+    ]
+  ],
+  "ohai_versions": [
+
+  ],
+  "gems": [
+
+  ]
+}
