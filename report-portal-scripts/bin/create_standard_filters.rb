@@ -31,13 +31,13 @@ report_portal.create_project
 puts "START\n------\n"
 report_portal.delete_standard_filters
 # Filters by version
-client.query('SELECT mariadb_version as version '\
+client.query('SELECT maxscale_source as source '\
              'FROM test_run '\
-             "WHERE mariadb_version <> '' "\
-             'GROUP BY mariadb_version').each do |row|
-  version = row['version']
+             "WHERE maxscale_source <> '' "\
+             'GROUP BY maxscale_source').each do |row|
+  source = row['source']
   report_portal.add_filter(
-    "VERSION #{version}",
+    "SOURCE #{source}",
     '',
     [
       {
@@ -48,7 +48,7 @@ client.query('SELECT mariadb_version as version '\
       {
         'filtering_field' => 'tags',
         'condition' => 'has',
-        'value' => "ver:#{version}"
+        'value' => "maxscale:#{source}"
       }
     ]
   )
