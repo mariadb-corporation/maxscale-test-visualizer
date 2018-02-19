@@ -1,3 +1,5 @@
+// Scripts for the pop-up window for selecting tests
+
 function selectedTestsCount() {
     return $('#selectTestsModalBody input:checkbox:checked').length;
 }

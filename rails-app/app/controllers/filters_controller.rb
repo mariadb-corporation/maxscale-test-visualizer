@@ -1,3 +1,5 @@
+# Controller for the page with filters
+
 class FiltersController < ApplicationController
   rescue_from ActiveRecord::StatementInvalid, with: :sql_statement_invalid
 
@@ -32,6 +34,7 @@ class FiltersController < ApplicationController
     db = ActiveRecord::Base.establish_connection.connection
 
     filtered_test_runs = db.execute(test_run_filters_to_sql(@selected_filters_values))
+    @filtered_test_runs_count = filtered_test_runs.count
 
     @selected_filters_values[:table_pages_count] = (filtered_test_runs.count.to_f / @selected_filters_values[:table_columns_count].to_f).ceil
     if @selected_filters_values[:page_num] == -1
@@ -73,7 +76,7 @@ class FiltersController < ApplicationController
     end
 
     if @selected_filters_values[:table_columns_count].zero?
-      @selected_filters_values[:table_columns_count] = 5
+      @selected_filters_values[:table_columns_count] = 20
     end
   end
 

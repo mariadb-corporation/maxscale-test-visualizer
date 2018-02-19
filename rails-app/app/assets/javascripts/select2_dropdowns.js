@@ -1,3 +1,5 @@
+// Set options for the 'select2' selectors
+
 $(document).ready(function () {
     $("#mariadb_version_select").select2({
         theme: "bootstrap",

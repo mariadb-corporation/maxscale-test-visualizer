@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Convert the intervals of "1, 2, 3-5" (example) to the sql-query
+  # "([field] = 1) OR ([field] = 2) OR ([field] BETWEEN 3 AND 5)"
   def ranges_string_to_sql(field, ranges_string)
     return '' if ranges_string.nil?
 
@@ -25,6 +27,8 @@ class ApplicationController < ActionController::Base
     result.join(' OR')
   end
 
+  # Generate the sql-query for the field by the selected values
+  # "[field] IN ('value_1', 'value_2')"
   def filter_field_to_sql(field, selected_filters_values, all_values_str)
     if selected_filters_values[field].nil? ||
         selected_filters_values[field].include?(all_values_str)
@@ -35,6 +39,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Generate the sql-query for the tests by the selected test names
+  # "results.test IN ('test_1', 'test_2')"
   def filter_tests_to_sql(field, values)
     return '' if values.nil? || values.keys.empty?
 
@@ -42,8 +48,11 @@ class ApplicationController < ActionController::Base
     "WHERE (#{field} IN ('#{values_str_temp}'))"
   end
 
+  # Generate the sql-query for the all filters by the selected values
+  # "WHERE (mariadb_version IN (...)) AND (maxscale_source IN (...)) ..."
   def filters_to_sql(selected_filters_values)
-    if !selected_filters_values[:use_sql_query].nil? && selected_filters_values[:use_sql_query] == 'true'
+    if !selected_filters_values[:use_sql_query].nil? && selected_filters_values[:use_sql_query] == 'true' &&
+        !selected_filters_values[:sql_query].nil? && !selected_filters_values[:sql_query].empty?
       return 'WHERE '.concat(selected_filters_values[:sql_query])
     end
 
@@ -72,6 +81,7 @@ class ApplicationController < ActionController::Base
     "(SELECT * FROM test_run #{filters_to_sql(selected_filters_values)})"
   end
 
+  # SQL-query for the table page with filtered test runs and tests
   def table_page_to_sql(selected_filters_values, test_runs_count, columns_count, page_num)
     limit, offset = calc_limit_and_offset(test_runs_count, columns_count, page_num)
 
@@ -112,11 +122,13 @@ class ApplicationController < ActionController::Base
     res
   end
 
+  # SQL-query for the test runs that are located on the table page
   def test_runs_on_page_sql(selected_filters_values, test_runs_count, columns_count, page_num)
     limit, offset = calc_limit_and_offset(test_runs_count, columns_count, page_num)
     "SELECT * FROM test_run #{filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}"
   end
 
+  # Limit and offset for the sql-query for the test_runs that are located on the table page
   def calc_limit_and_offset(test_runs_count, columns_count, page_num)
     modulo = test_runs_count % columns_count
 

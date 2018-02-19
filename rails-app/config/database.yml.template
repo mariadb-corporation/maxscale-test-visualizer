@@ -1,6 +1,6 @@
 default: &default
   adapter: mysql2
-  database: test_results_db
+  database: mariadb
   username: root
   password: "0000"
   host: localhost

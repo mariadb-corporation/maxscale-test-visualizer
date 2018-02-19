@@ -1,3 +1,5 @@
+// Scripts for the enable / disable sql-query input mode
+
 function disableInputSelects() {
     $("#mariadb_version_select").prop( "disabled", true );
     $("#maxscale_source_select").prop( "disabled", true );

@@ -78,20 +78,25 @@
           = render 'table_pagination'
         .col-auto
           .form-group.row
-            %label.col-form-label{:for => "itemsPerPageCountSelect"} Items per page
+            %label.col-form-label{:for => "itemsPerPageCountSelect"} Test runs per page
             .col
-              %select#itemsPerPageCountSelect.form-control.form-control{'data-items-per-page-count' => 5}
+              %select#itemsPerPageCountSelect.form-control.form-control{'data-items-per-page-count' => 20}
                 %option{value: 5} 5
                 %option{value: 10} 10
                 %option{value: 20} 20
                 %option{value: 30} 30
+                %option{value: 50} 50
+        .col-auto
+          .form-group.row
+            %label.col-form-label
+              = '(Total count: ' + @filtered_test_runs_count.to_s + ')'
       .row
         .col
-          .table-container
+          .sticky-table.sticky-headers.sticky-ltr-cells
             %table#main-table.table-bordered.table-hover.table.table-sm{pagination: "true", 'rows-count' => @tests_names.size}
               %thead
-                %tr
-                  %th.v-align-middle{:scope => "col"} Test Name \ Tests Run
+                %tr.sticky-row
+                  %th.sticky-cell.v-align-middle{:scope => "col"} Test Name \ Tests Run
                   - @test_runs.each do |test_run|
                     %th.text-center.v-align-top{:scope => "col"}
                       %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
@@ -105,11 +110,10 @@
               %tbody
                 - @tests_names.each do |test_name|
                   %tr
-                    %th{:scope => "row"}
+                    %th.sticky-cell{:scope => "row"}
                       = test_name
 
                     - @test_runs.each do |test_run|
                       %td.text-center
                         %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(test_result(@final_result, test_run, test_name))}
                           = ion_icon (format_test_result test_result(@final_result, test_run, test_name))
-            %table.table-bordered.table-hover#header-fixed

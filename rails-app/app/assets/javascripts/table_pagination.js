@@ -1,5 +1,8 @@
+// Scripts for the table pagination
+
 function setPageNumLabel() {
-    $("#currentPageLabel").text(currentPage());
+    var text = "Page: " + currentPage() +  " of " + pagesCount();
+    $("#currentPageLabel").text(text);
 }
 
 function setPageNum(pageNum) {
