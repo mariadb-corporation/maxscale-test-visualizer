@@ -115,5 +115,6 @@
 
                     - @test_runs.each do |test_run|
                       %td.text-center
-                        %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(test_result(@final_result, test_run, test_name))}
-                          = ion_icon (format_test_result test_result(@final_result, test_run, test_name))
+                        - test_result = test_result(@final_result, test_run, test_name)
+                        %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(test_result)}
+                          = ion_icon (format_test_result test_result)
