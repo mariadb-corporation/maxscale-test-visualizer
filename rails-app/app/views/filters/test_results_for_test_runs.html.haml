@@ -48,7 +48,7 @@
                   = render 'layouts/flashes'
                   .form-group
                     %span.input-group-text.align-items-start.justify-content-between
-                      SELECT * FROM test_run WHERE
+                      Example: SELECT * FROM test_run WHERE box = "centos_7_libvirt"
                       %button.btn.btn-sm.btn-link{"data-target" => "#sqlQueryHelpModal", "data-toggle" => "modal", :type => "button"}
                         = ion_icon('help-circled')
                     %textarea#sql_query_textarea.form-control{:rows => "4", :type => "text", :name => "sql_query"}

@@ -51,11 +51,6 @@ class ApplicationController < ActionController::Base
   # Generate the sql-query for the all filters by the selected values
   # "WHERE (mariadb_version IN (...)) AND (maxscale_source IN (...)) ..."
   def filters_to_sql(selected_filters_values)
-    if !selected_filters_values[:use_sql_query].nil? && selected_filters_values[:use_sql_query] == 'true' &&
-        !selected_filters_values[:sql_query].nil? && !selected_filters_values[:sql_query].empty?
-      return 'WHERE '.concat(selected_filters_values[:sql_query])
-    end
-
     result = []
 
     mariadb_version = filter_field_to_sql(:mariadb_version, selected_filters_values, 'All')
@@ -78,7 +73,14 @@ class ApplicationController < ActionController::Base
   end
 
   def test_run_filters_to_sql(selected_filters_values)
-    "(SELECT * FROM test_run #{filters_to_sql(selected_filters_values)})"
+    if !selected_filters_values[:use_sql_query].nil? && selected_filters_values[:use_sql_query] == 'true' &&
+        !selected_filters_values[:sql_query].nil? && !selected_filters_values[:sql_query].empty?
+      return selected_filters_values[:sql_query]
+    else
+      condition = filters_to_sql(selected_filters_values)
+    end
+
+    "SELECT * FROM test_run #{condition}"
   end
 
   # SQL-query for the table page with filtered test runs and tests
@@ -91,7 +93,7 @@ class ApplicationController < ActionController::Base
         "SELECT results.test, results.result, filter_test_run.* "\
       "FROM results "\
       "INNER JOIN "\
-      "  (SELECT * FROM test_run #{filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}) "\
+      "  (#{test_run_filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}) "\
       "  as filter_test_run using(id) "\
       "#{tests_filter} "
 
@@ -125,7 +127,7 @@ class ApplicationController < ActionController::Base
   # SQL-query for the test runs that are located on the table page
   def test_runs_on_page_sql(selected_filters_values, test_runs_count, columns_count, page_num)
     limit, offset = calc_limit_and_offset(test_runs_count, columns_count, page_num)
-    "SELECT * FROM test_run #{filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}"
+    "#{test_run_filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}"
   end
 
   # Limit and offset for the sql-query for the test_runs that are located on the table page

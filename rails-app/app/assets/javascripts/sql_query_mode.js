@@ -24,6 +24,7 @@ function enableSqlTextarea() {
 
 function setDisabled() {
     if($("#use_sql_query_check")[0].checked == true) {
+        // fillSQLQueryField();
         disableInputSelects();
         enableSqlTextarea();
     } else {
@@ -32,9 +33,30 @@ function setDisabled() {
     }
 }
 
+function fillSQLQueryField() {
+    $("#sql_query_textarea").val("");
+
+    $("#filtersForm").ajaxSubmit({
+            url: "/generate_user_sql_query_by_filters",
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $("#sql_query_textarea").val(data.sql_query);
+            }
+        })
+}
+
 $(document).ready(function () {
-    $("#use_sql_query_check").change(function() {
+    $("#use_sql_query_check").click(function() {
+        if($(this)[0].checked == true) {
+            fillSQLQueryField();
+        }
         setDisabled();
+    });
+
+    $("#filtersForm").submit(function( event ) {
+        enableInputSelects();
+        enableSqlTextarea();
     });
 
     setDisabled();

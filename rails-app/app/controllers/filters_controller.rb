@@ -9,7 +9,7 @@ class FiltersController < ApplicationController
 
   skip_before_action :verify_authenticity_token
   before_action :setup_selected_filters_values,
-                only: [:test_results_for_test_runs, :apply_filters]
+                only: [:test_results_for_test_runs, :apply_filters, :generate_sql_for_displaying_on_page]
 
   def test_results_for_test_runs
     main_filter
@@ -18,6 +18,11 @@ class FiltersController < ApplicationController
   def apply_filters
     main_filter
     render :test_results_for_test_runs
+  end
+
+  def generate_sql_for_displaying_on_page
+    query = test_run_filters_to_sql(@selected_filters_values)
+    render json: { sql_query: query }
   end
 
   private
