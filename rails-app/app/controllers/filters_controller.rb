@@ -21,7 +21,7 @@ class FiltersController < ApplicationController
   end
 
   def generate_sql_for_displaying_on_page
-    query = test_run_filters_to_sql(@selected_filters_values)
+    query = filters_to_sql(@selected_filters_values)
     render json: { sql_query: query }
   end
 

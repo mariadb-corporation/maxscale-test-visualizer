@@ -41,17 +41,15 @@
                       %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @selected_filters_values[:jenkins_build]}
 
                 .col
-                  .form-check
-                    %input.form-check-input{id: "use_sql_query_check", type: "checkbox", value: "true", name: "use_sql_query", checked: !@selected_filters_values[:use_sql_query].nil?}
-                    %label.form-check-label{:for => "use_sql_query_check"} Use SQL query
-
                   = render 'layouts/flashes'
                   .form-group
-                    %span.input-group-text.align-items-start.justify-content-between
-                      Example: SELECT * FROM test_run WHERE box = "centos_7_libvirt"
+                    .input-group-prepend.align-items-start.justify-content-between
+                      .form-check
+                        %input.form-check-input{id: "use_sql_query_check", type: "checkbox", value: "true", name: "use_sql_query", checked: !@selected_filters_values[:use_sql_query].nil?}
+                        %label.form-check-label{:for => "use_sql_query_check"} Custom Filter
                       %button.btn.btn-sm.btn-link{"data-target" => "#sqlQueryHelpModal", "data-toggle" => "modal", :type => "button"}
                         = ion_icon('help-circled')
-                    %textarea#sql_query_textarea.form-control{:rows => "4", :type => "text", :name => "sql_query"}
+                    %textarea#sql_query_textarea.form-control{:rows => "4", :type => "text", :name => "sql_query", :placeholder => "(mariadb_version IN ('10.0', '10.1')) AND (box = 'centos_7_libvirt')"}
                       = @selected_filters_values[:sql_query]
 
               / row with hidden fields (for pagination)

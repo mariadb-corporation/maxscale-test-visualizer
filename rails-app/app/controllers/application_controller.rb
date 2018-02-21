@@ -49,8 +49,13 @@ class ApplicationController < ActionController::Base
   end
 
   # Generate the sql-query for the all filters by the selected values
-  # "WHERE (mariadb_version IN (...)) AND (maxscale_source IN (...)) ..."
+  # "(mariadb_version IN (...)) AND (maxscale_source IN (...)) ..."
   def filters_to_sql(selected_filters_values)
+    if !selected_filters_values[:use_sql_query].nil? && selected_filters_values[:use_sql_query] == 'true' &&
+       !selected_filters_values[:sql_query].nil? && !selected_filters_values[:sql_query].empty?
+      return selected_filters_values[:sql_query]
+    end
+
     result = []
 
     mariadb_version = filter_field_to_sql(:mariadb_version, selected_filters_values, 'All')
@@ -68,16 +73,14 @@ class ApplicationController < ActionController::Base
     if result.empty?
       return ''
     else
-      return 'WHERE '.concat(result.join(' AND '))
+      return result.join(' AND ')
     end
   end
 
   def test_run_filters_to_sql(selected_filters_values)
-    if !selected_filters_values[:use_sql_query].nil? && selected_filters_values[:use_sql_query] == 'true' &&
-        !selected_filters_values[:sql_query].nil? && !selected_filters_values[:sql_query].empty?
-      return selected_filters_values[:sql_query]
-    else
-      condition = filters_to_sql(selected_filters_values)
+    condition = filters_to_sql(selected_filters_values)
+    unless condition.empty?
+      condition = 'WHERE ' + condition
     end
 
     "SELECT * FROM test_run #{condition}"
