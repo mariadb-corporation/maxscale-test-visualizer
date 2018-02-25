@@ -116,3 +116,7 @@
                         - test_result = test_result(@final_result, test_run, test_name)
                         %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(test_result)}
                           = ion_icon (format_test_result test_result)
+
+          - if !@result_is_empty.nil? && @result_is_empty
+            %strong.row.justify-content-center.text-muted
+              No results found on request

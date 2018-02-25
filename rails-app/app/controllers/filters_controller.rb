@@ -42,25 +42,34 @@ class FiltersController < ApplicationController
     filtered_test_runs = db.execute(test_run_filters_to_sql(@selected_filters_values))
     @filtered_test_runs_count = filtered_test_runs.count
 
-    @selected_filters_values[:table_pages_count] = (filtered_test_runs.count.to_f / @selected_filters_values[:table_columns_count].to_f).ceil
-    if @selected_filters_values[:page_num] == -1
-      @selected_filters_values[:page_num] = @selected_filters_values[:table_pages_count]
+    if @filtered_test_runs_count > 0
+      @selected_filters_values[:table_pages_count] = (filtered_test_runs.count.to_f / @selected_filters_values[:table_columns_count].to_f).ceil
+      if @selected_filters_values[:page_num] == -1
+        @selected_filters_values[:page_num] = @selected_filters_values[:table_pages_count]
+      end
+
+      query_result = db.execute(table_page_to_sql(@selected_filters_values, filtered_test_runs.count, @selected_filters_values[:table_columns_count], @selected_filters_values[:page_num]))
+      test_runs_on_page = db.execute(test_runs_on_page_sql(@selected_filters_values, filtered_test_runs.count, @selected_filters_values[:table_columns_count], @selected_filters_values[:page_num]))
+
+      @final_result = []
+      query_result.each(:as => :hash) do |row|
+        @final_result << row
+      end
+
+      @test_runs = []
+      test_runs_on_page.each(:as => :hash) do |row|
+        @test_runs << row
+      end
+
+      @tests_names = @final_result.collect { |row| row['test'] }.uniq
+    else
+      @result_is_empty = true
+      @tests_names = []
+      @test_runs = []
+      @final_result = []
     end
 
-    query_result = db.execute(table_page_to_sql(@selected_filters_values, filtered_test_runs.count, @selected_filters_values[:table_columns_count], @selected_filters_values[:page_num]))
-    test_runs_on_page = db.execute(test_runs_on_page_sql(@selected_filters_values, filtered_test_runs.count, @selected_filters_values[:table_columns_count], @selected_filters_values[:page_num]))
 
-    @final_result = []
-    query_result.each(:as => :hash) do |row|
-      @final_result << row
-    end
-
-    @test_runs = []
-    test_runs_on_page.each(:as => :hash) do |row|
-      @test_runs << row
-    end
-
-    @tests_names = @final_result.collect { |row| row['test'] }.uniq
   end
 
   def setup_selected_filters_values
@@ -87,7 +96,7 @@ class FiltersController < ApplicationController
   end
 
   def sql_statement_invalid
-    flash.now[:error] = 'SQL query is invalid or query result is empty.'
+    flash.now[:error] = 'SQL query is invalid!'
     @tests_names = []
     @test_runs = []
     render :test_results_for_test_runs
