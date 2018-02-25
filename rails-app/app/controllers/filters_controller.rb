@@ -12,6 +12,7 @@ class FiltersController < ApplicationController
                 only: [:test_results_for_test_runs, :apply_filters, :generate_sql_for_displaying_on_page]
 
   def test_results_for_test_runs
+    @selected_filters_values[:hide_passed_tests] = 'true'
     main_filter
   end
 
