@@ -1,8 +1,6 @@
 # Controller for the page with filters
 
 class FiltersController < ApplicationController
-  rescue_from ActiveRecord::StatementInvalid, with: :sql_statement_invalid
-
   add_flash_types :error
 
   DEFAULT_TEST_RUN_COUNT = 10
@@ -17,8 +15,16 @@ class FiltersController < ApplicationController
   end
 
   def apply_filters
-    main_filter
-    render :test_results_for_test_runs
+    make_query
+    render json: {
+      partial: render_to_string(partial: 'filters/result_table', layout: false),
+      page_num: @selected_filters_values[:page_num],
+      table_columns_count: @selected_filters_values[:table_columns_count],
+      table_pages_count: @selected_filters_values[:table_pages_count],
+      total_count: @filtered_test_runs_count,
+      query_error: @query_error,
+      flashes: render_to_string(partial: 'layouts/flashes', layout: false)
+    }
   end
 
   def generate_sql_for_displaying_on_page
@@ -37,12 +43,23 @@ class FiltersController < ApplicationController
     @box_options = TestRun.box_values
     @test_options = Result.test_names
 
+    make_query
+  end
+
+  def make_query
+    @query_error = false
+
     db = ActiveRecord::Base.establish_connection.connection
 
-    filtered_test_runs = db.execute(test_run_filters_to_sql(@selected_filters_values))
-    @filtered_test_runs_count = filtered_test_runs.count
+    begin
+      filtered_test_runs = db.execute(test_run_filters_to_sql(@selected_filters_values))
+      @filtered_test_runs_count = filtered_test_runs.count
+    rescue Exception => e
+      @query_error = true
+      flash.now[:error] = 'SQL query is invalid!'
+    end
 
-    if @filtered_test_runs_count > 0
+    if !@query_error && @filtered_test_runs_count > 0
       @selected_filters_values[:table_pages_count] = (filtered_test_runs.count.to_f / @selected_filters_values[:table_columns_count].to_f).ceil
       if @selected_filters_values[:page_num] == -1
         @selected_filters_values[:page_num] = @selected_filters_values[:table_pages_count]
@@ -68,8 +85,6 @@ class FiltersController < ApplicationController
       @test_runs = []
       @final_result = []
     end
-
-
   end
 
   def setup_selected_filters_values
@@ -93,12 +108,5 @@ class FiltersController < ApplicationController
     if @selected_filters_values[:table_columns_count].zero?
       @selected_filters_values[:table_columns_count] = 20
     end
-  end
-
-  def sql_statement_invalid
-    flash.now[:error] = 'SQL query is invalid!'
-    @tests_names = []
-    @test_runs = []
-    render :test_results_for_test_runs
   end
 end

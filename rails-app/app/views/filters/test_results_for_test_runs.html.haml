@@ -4,7 +4,7 @@
       .row
         .card.width-100
           .card-body
-            %form#filtersForm.width-100{:action => filter_path, :method => "post"}
+            %form#filtersForm.width-100{:action => filter_path, :method => "post", 'data-remote' => true}
               .row
                 .col
                   .form-group.row
@@ -41,7 +41,7 @@
                       %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @selected_filters_values[:jenkins_build]}
 
                 .col
-                  = render 'layouts/flashes'
+                  #flashesContainer
                   .form-group
                     .input-group-prepend.align-items-start.justify-content-between
                       .form-check
@@ -86,37 +86,12 @@
                 %option{value: 50} 50
         .col-auto
           .form-group.row
-            %label.col-form-label
+            %label#totalCount.col-form-label
               = '(Total count: ' + @filtered_test_runs_count.to_s + ')'
       .row
         .col
-          .sticky-table.sticky-headers.sticky-ltr-cells
-            %table#main-table.table-bordered.table-hover.table.table-sm{pagination: "true", 'rows-count' => @tests_names.size}
-              %thead
-                %tr.sticky-row
-                  %th.sticky-cell.v-align-middle{:scope => "col"} Test Name \ Tests Run
-                  - @test_runs.each do |test_run|
-                    %th.text-center.v-align-top{:scope => "col"}
-                      %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
-                        = test_run['jenkins_id']
-                      .xx-small-font
-                        = test_run['maxscale_source']
-                        %br
-                        = test_run['target']
-                        %br
-                        = test_run['start_time'].to_s.delete 'UTC'
-              %tbody
-                - @tests_names.each do |test_name|
-                  %tr
-                    %th.sticky-cell{:scope => "row"}
-                      = test_name
+          #main-table-container
+            = render 'filters/result_table'
 
-                    - @test_runs.each do |test_run|
-                      %td.text-center
-                        - test_result = test_result(@final_result, test_run, test_name)
-                        %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(test_result)}
-                          = ion_icon (format_test_result test_result)
 
-          - if !@result_is_empty.nil? && @result_is_empty
-            %strong.row.justify-content-center.text-muted
-              No results found on request
+

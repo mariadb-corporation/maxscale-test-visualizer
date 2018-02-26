@@ -1,10 +1,9 @@
 // Scripts for the result table: setting up the pop-up window, scroll table to the right
 
-$(document).ready(function () {
+function initPopover() {
 
     $('.sticky-table').scrollLeft($('#main-table').width());
 
-    // Popover
     $(function () {
         $('[data-toggle="popover"]').popover({
             trigger: 'focus',
@@ -14,4 +13,8 @@ $(document).ready(function () {
             }
         })
     })
+}
+
+$(document).ready(function () {
+    initPopover();
 });

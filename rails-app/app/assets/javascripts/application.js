@@ -16,4 +16,11 @@
 
 //= require rails-ujs
 //= require select2-full
-//= require_tree .
+//= require cable
+//= require jquery.form
+//= require jquery.stickytable
+//= require modal_test_selector
+//= require select2_dropdowns
+//= require sql_query_mode
+//= require table_scripts
+//= require table_pagination
