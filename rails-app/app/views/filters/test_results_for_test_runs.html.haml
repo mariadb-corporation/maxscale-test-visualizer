@@ -39,6 +39,23 @@
                       %label{:for => "jenkins_build_input"} Test run (Jenkins build id)
                     .col
                       %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @selected_filters_values[:jenkins_build]}
+                  .form-group.row
+                    .col-3
+                      %label{:for => "time_interval_dropdown"} Time interval
+                    .col
+                      %select#time_interval_dropdown.form-control.form-control{:name => "time_interval_dropdown"}
+                        %option{value: 1} 1 day
+                        %option{value: 2} 2 days
+                        %option{value: 5} 5 days
+                        %option{value: -1, selected: true} All time
+                        %option{value: 0} Set interval
+                  .form-group.row#time_interval_form
+                    .col-3
+                    .col
+                      %input#time_interval_start.form-control{:placeholder => "", :type => "date", :name => "time_interval_start", :value => @selected_filters_values[:time_interval_start]}
+                    .col
+                      %input#time_interval_finish.form-control{:placeholder => "", :type => "date", :name => "time_interval_finish", :value => @selected_filters_values[:time_interval_finish]}
+
 
                 .col
                   #flashesContainer

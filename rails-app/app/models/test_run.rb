@@ -14,4 +14,8 @@ class TestRun < ApplicationRecord
   def self.box_values
     select('box').group('box')
   end
+
+  def self.last_date
+    select('start_time').order(start_time: :desc).first.start_time
+  end
 end

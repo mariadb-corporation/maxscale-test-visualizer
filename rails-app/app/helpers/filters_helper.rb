@@ -44,7 +44,7 @@ module FiltersHelper
   end
 
   def test_run_info(test_run)
-    "<b>id:</b> #{test_run['id']} <br>"\
+    "<b>Jenkins id:</b> #{test_run['jenkins_id']} <br>"\
     "<b>Start time:</b> #{test_run['start_time']} <br>"\
     "<b>Target:</b> #{test_run['target']} <br>"\
     "<b>Box:</b> #{test_run['box']} <br>"\

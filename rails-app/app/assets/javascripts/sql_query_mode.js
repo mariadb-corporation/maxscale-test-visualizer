@@ -5,6 +5,9 @@ function disableInputSelects() {
     $("#maxscale_source_select").prop( "disabled", true );
     $("#box_select").prop( "disabled", true );
     $("#jenkins_build_input").prop( "disabled", true );
+    $("#time_interval_dropdown").prop( "disabled", true );
+    $("#time_interval_start").prop( "disabled", true );
+    $("#time_interval_finish").prop( "disabled", true );
 }
 
 function enableInputSelects() {
@@ -12,6 +15,9 @@ function enableInputSelects() {
     $("#maxscale_source_select").prop( "disabled", false );
     $("#box_select").prop( "disabled", false );
     $("#jenkins_build_input").prop( "disabled", false );
+    $("#time_interval_dropdown").prop( "disabled", false );
+    $("#time_interval_start").prop( "disabled", false );
+    $("#time_interval_finish").prop( "disabled", false );
 }
 
 function disableSqlTextarea() {

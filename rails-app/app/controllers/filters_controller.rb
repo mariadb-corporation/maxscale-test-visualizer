@@ -98,7 +98,10 @@ class FiltersController < ApplicationController
         use_sql_query: params['use_sql_query'],
         sql_query: params['sql_query'],
         page_num: params['page_num'].to_i,
-        table_columns_count: params['table_columns_count'].to_i
+        table_columns_count: params['table_columns_count'].to_i,
+        time_interval_dropdown: params['time_interval_dropdown'].to_i,
+        time_interval_start: params['time_interval_start'],
+        time_interval_finish: params['time_interval_finish']
     }
 
     if @selected_filters_values[:page_num].zero?

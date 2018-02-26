@@ -48,6 +48,10 @@ class ApplicationController < ActionController::Base
     "WHERE (#{field} IN ('#{values_str_temp}'))"
   end
 
+  def time_interval_to_sql(field_name, start, finish)
+    "(#{field_name} BETWEEN '#{start.to_time}' AND '#{finish.to_time}')"
+  end
+
   # Generate the sql-query for the all filters by the selected values
   # "(mariadb_version IN (...)) AND (maxscale_source IN (...)) ..."
   def filters_to_sql(selected_filters_values)
@@ -69,6 +73,25 @@ class ApplicationController < ActionController::Base
 
     jenkins_id = ranges_string_to_sql('jenkins_id', @selected_filters_values[:jenkins_build])
     result << jenkins_id unless jenkins_id.empty?
+
+    # time intervals
+    if selected_filters_values[:time_interval_dropdown] > 0
+      time_interval_finish = TestRun.last_date
+      time_interval_start = TestRun.last_date - selected_filters_values[:time_interval_dropdown].days
+
+      result << time_interval_to_sql('start_time', time_interval_start, time_interval_finish)
+    elsif selected_filters_values[:time_interval_dropdown] == 0 &&
+          !selected_filters_values[:time_interval_start].nil? &&
+          !selected_filters_values[:time_interval_finish].nil?
+      time_interval_start = TestRun.last_date
+      time_interval_finish = TestRun.last_date
+      time_interval_start = selected_filters_values[:time_interval_start] unless selected_filters_values[:time_interval_start].empty?
+      time_interval_finish = selected_filters_values[:time_interval_finish] unless selected_filters_values[:time_interval_finish].empty?
+
+      result << time_interval_to_sql('start_time',
+                                     time_interval_start,
+                                     time_interval_finish)
+    end
 
     if result.empty?
       return ''

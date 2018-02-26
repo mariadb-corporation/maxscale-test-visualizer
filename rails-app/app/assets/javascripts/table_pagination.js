@@ -46,7 +46,6 @@ function refreshPageData() {
 
 
 function formAjaxRequest() {
-    console.log('Запустил!');
     $("#filtersForm").ajaxSubmit({
         url: "/filter",
         type: 'POST',
