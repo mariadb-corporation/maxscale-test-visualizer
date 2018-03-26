@@ -8,6 +8,8 @@ function disableInputSelects() {
     $("#time_interval_dropdown").prop( "disabled", true );
     $("#time_interval_start").prop( "disabled", true );
     $("#time_interval_finish").prop( "disabled", true );
+    $("#dbms_select").prop( "disabled", true );
+    $("#test_tool_select").prop( "disabled", true );
 }
 
 function enableInputSelects() {
@@ -18,6 +20,8 @@ function enableInputSelects() {
     $("#time_interval_dropdown").prop( "disabled", false );
     $("#time_interval_start").prop( "disabled", false );
     $("#time_interval_finish").prop( "disabled", false );
+    $("#dbms_select").prop( "disabled", false );
+    $("#test_tool_select").prop( "disabled", false );
 }
 
 function disableSqlTextarea() {

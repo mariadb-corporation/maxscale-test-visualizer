@@ -39,6 +39,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def field_with_version_to_sql(values, field_name, field_version_name, all_values_str)
+    if values.nil? ||
+        values.include?(all_values_str)
+      ''
+    else
+      res = []
+      values.each do |value|
+        res << "(#{field_name} = '#{value.split(' ').first}' AND #{field_version_name} = '#{value.split(' ')[1..-1].join(' ')}')"
+      end
+      res.join(' OR ')
+    end
+  end
+
   # Generate the sql-query for the tests by the selected test names
   # "results.test IN ('test_1', 'test_2')"
   def filter_tests_to_sql(field, values)
@@ -71,20 +84,31 @@ class ApplicationController < ActionController::Base
     box = filter_field_to_sql(:box, selected_filters_values, 'All')
     result << box unless box.empty?
 
-    jenkins_id = ranges_string_to_sql('jenkins_id', @selected_filters_values[:jenkins_build])
+    jenkins_id = ranges_string_to_sql('jenkins_id', selected_filters_values[:jenkins_build])
     result << jenkins_id unless jenkins_id.empty?
 
-    # time intervals
-    if selected_filters_values[:time_interval_dropdown] > 0
-      time_interval_finish = TestRun.last_date
-      time_interval_start = TestRun.last_date - selected_filters_values[:time_interval_dropdown].days
+    dbms = field_with_version_to_sql(selected_filters_values[:dbms], 'product', 'mariadb_version', 'All')
+    result << "(#{dbms})" unless dbms.empty?
 
+    test_tool = field_with_version_to_sql(selected_filters_values[:test_tool], 'test_tool', 'test_tool_version', 'All')
+    result << "(#{test_tool})" unless test_tool.empty?
+
+
+    # time intervals
+    if selected_filters_values[:filter_page] == 'TestRun'
+      model = TestRun
+    elsif selected_filters_values[:filter_page] == 'PerformanceTestRun'
+      model = PerformanceTestRun
+    end
+    if selected_filters_values[:time_interval_dropdown] > 0
+      time_interval_finish = model.last_date
+      time_interval_start = model.last_date - selected_filters_values[:time_interval_dropdown].days
       result << time_interval_to_sql('start_time', time_interval_start, time_interval_finish)
     elsif selected_filters_values[:time_interval_dropdown] == 0 &&
           !selected_filters_values[:time_interval_start].nil? &&
           !selected_filters_values[:time_interval_finish].nil?
-      time_interval_start = TestRun.last_date
-      time_interval_finish = TestRun.last_date
+      time_interval_start = model.last_date
+      time_interval_finish = model.last_date
       time_interval_start = selected_filters_values[:time_interval_start] unless selected_filters_values[:time_interval_start].empty?
       time_interval_finish = selected_filters_values[:time_interval_finish] unless selected_filters_values[:time_interval_finish].empty?
 
@@ -110,7 +134,7 @@ class ApplicationController < ActionController::Base
   end
 
   # SQL-query for the table page with filtered test runs and tests
-  def table_page_to_sql(selected_filters_values, test_runs_count, columns_count, page_num)
+  def test_run_table_page_to_sql(selected_filters_values, test_runs_count, columns_count, page_num)
     limit, offset = calc_limit_and_offset(test_runs_count, columns_count, page_num)
 
     tests_filter = filter_tests_to_sql('results.test', selected_filters_values[:tests_names])
@@ -169,6 +193,74 @@ class ApplicationController < ActionController::Base
     end
 
     return limit, offset
+  end
+
+  def performance_test_run_filters_to_sql(selected_filters_values)
+    condition = filters_to_sql(selected_filters_values)
+    unless condition.empty?
+      condition = 'WHERE ' + condition
+    end
+
+    res =
+        "SELECT *"\
+        "    FROM ( "\
+        "      SELECT "\
+      "            PTR.id, "\
+        "          PTR.jenkins_id, "\
+        "          PTR.start_time, "\
+        "          PTR.box, "\
+        "          PTR.product, "\
+        "          PTR.mariadb_version, "\
+        "          PTR.test_code_commit_id, "\
+        "          PTR.job_name, "\
+        "          PTR.machine_count, "\
+        "          PTR.sysbench_params, "\
+        "          PTR.mdbci_template, "\
+        "          PTR.test_tool, "\
+        "          PTR.test_tool_version, "\
+        "          PTR.product_under_test, "\
+        "          MP.target, "\
+        "          MP.maxscale_commit_id, "\
+        "          MP.maxscale_cnf, "\
+        "          MP.maxscale_source, "\
+        "          SR.OLTP_test_statistics_ignored_errors, "\
+        "          SR.General_statistics_response_time_approx__95_percentile, "\
+        "          SR.General_statistics_response_time_avg, "\
+        "          SR.General_statistics_response_time_max, "\
+        "          SR.General_statistics_response_time_min, "\
+        "          SR.General_statistics_total_number_of_events, "\
+        "          SR.General_statistics_total_time, "\
+        "          SR.General_statistics_total_time_taken_by_event_execution, "\
+        "          SR.OLTP_test_statistics_other_operations, "\
+        "          SR.OLTP_test_statistics_queries_performed_other, "\
+        "          SR.OLTP_test_statistics_queries_performed_read, "\
+        "          SR.OLTP_test_statistics_queries_performed_total, "\
+        "          SR.OLTP_test_statistics_queries_performed_write, "\
+        "          SR.OLTP_test_statistics_read_write_requests, "\
+        "          SR.OLTP_test_statistics_reconnects, "\
+        "          SR.OLTP_test_statistics_transactions, "\
+        "          SR.Threads_fairness_events_avg, "\
+        "          SR.Threads_fairness_events_stddev, "\
+        "          SR.Threads_fairness_execution_time_avg, "\
+        "          SR.Threads_fairness_execution_time_stddev "\
+        "      FROM "\
+        "        performance_test_run AS PTR "\
+        "      LEFT OUTER JOIN "\
+        "        maxscale_parameters AS MP "\
+        "      ON PTR.id = MP.id "\
+        "      LEFT OUTER JOIN "\
+        "        sysbench_results AS SR "\
+        "      ON PTR.id = SR.id "\
+        "    ) AS MAIN_TABLE "
+
+    res + condition
+  end
+
+  def performance_test_run_table_page_to_sql(selected_filters_values, test_runs_count, columns_count, page_num)
+    limit, offset = calc_limit_and_offset(test_runs_count, columns_count, page_num)
+    res = performance_test_run_filters_to_sql(selected_filters_values) +
+        " ORDER BY start_time LIMIT #{limit} OFFSET #{offset}; "
+    res
   end
 
   def is_i?(str)

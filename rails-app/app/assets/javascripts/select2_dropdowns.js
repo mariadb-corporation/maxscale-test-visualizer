@@ -16,4 +16,14 @@ $(document).ready(function () {
         placeholder: "Select a box",
         width: '100%'
     });
+    $("#test_tool_select").select2({
+        theme: "bootstrap",
+        placeholder: "Select a test tool version",
+        width: '100%'
+    });
+    $("#dbms_select").select2({
+        theme: "bootstrap",
+        placeholder: "Select a product version",
+        width: '100%'
+    });
 });

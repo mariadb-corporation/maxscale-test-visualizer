@@ -47,7 +47,7 @@ function refreshPageData() {
 
 function formAjaxRequest() {
     $("#filtersForm").ajaxSubmit({
-        url: "/filter",
+        url: $("#filtersForm")[0].action,
         type: 'POST',
         dataType: 'json',
         success: function(data){

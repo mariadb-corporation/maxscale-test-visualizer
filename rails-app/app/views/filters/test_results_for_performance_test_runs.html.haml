@@ -4,18 +4,27 @@
       .row
         .card.width-100
           .card-body
-            %form#filtersForm.width-100{:action => test_run_path, :method => "post", 'data-remote' => true}
+            %form#filtersForm.width-100{:action => performance_test_run_path, :method => "post", 'data-remote' => true}
               .row
                 .col
                   .form-group.row
                     .col-3
-                      %label{:for => "mariadb_version_select"} MariaDB version
+                      %label{:for => "dbms_select"} Product
                     .col
-                      %select#mariadb_version_select.form-control{:multiple => "multiple", :name => "mariadb_version[]"}
-                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:mariadb_version])} All
-                        - @mariadb_version_options.each do |mariadb_version|
-                          %option{:value => mariadb_version.mariadb_version, :selected => option_selected?(mariadb_version.mariadb_version, @selected_filters_values[:mariadb_version])}
-                            = mariadb_version.mariadb_version
+                      %select#dbms_select.form-control{:multiple => "multiple", :name => "dbms[]"}
+                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:dbms])} All
+                        - @dbms_options.each do |dbms|
+                          %option{:value => dbms, :selected => option_selected?(dbms, @selected_filters_values[:dbms])}
+                            = dbms
+                  .form-group.row
+                    .col-3
+                      %label{:for => "test_tool_select"} Test tool
+                    .col
+                      %select#test_tool_select.form-control{:multiple => "multiple", :name => "test_tool[]"}
+                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:test_tool])} All
+                        - @test_tool_options.each do |test_tool|
+                          %option{:value => test_tool, :selected => option_selected?(test_tool, @selected_filters_values[:test_tool])}
+                            = test_tool
                   .form-group.row
                     .col-3
                       %label{:for => "maxscale_source_select"} Maxscale source
@@ -25,15 +34,6 @@
                         - @maxscale_source_options.each do |maxscale_source|
                           %option{:value => maxscale_source.maxscale_source, :selected => option_selected?(maxscale_source.maxscale_source, @selected_filters_values[:maxscale_source])}
                             = maxscale_source.maxscale_source
-                  .form-group.row
-                    .col-3
-                      %label{:for => "box_select"} Box
-                    .col
-                      %select#box_select.form-control{:multiple => "multiple", :name => "box[]"}
-                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:box])} All
-                        - @box_options.each do |box|
-                          %option{:value => box.box, :selected => option_selected?(box.box, @selected_filters_values[:box])}
-                            = box.box
                   .form-group.row
                     .col-3
                       %label{:for => "jenkins_build_input"} Test run (Jenkins build id)
@@ -78,23 +78,14 @@
 
               .row.align-items-center
                 .col
-                  .form-group.mb-0
-                    %button#selectTestsButton.btn.btn-outline-dark.btn-block{:type => "button",  :'data-toggle' => "modal", :'data-target' => "#selectTestsModal"} Select tests
-                .col
-                  .form-check
-                    %input.form-check-input{id: "hide_passed_tests_check", type: "checkbox", value: "true", name: "hide_passed_tests", checked: !@selected_filters_values[:hide_passed_tests].nil?}
-                    %label.form-check-label{:for => "hide_passed_tests_check"} Hide the passed tests
-                .col
                   %button#submitButton.btn.btn-primary.btn-block{:type => "submit"} Submit
-              = render 'select_tests_modal'
-              = render 'sql_query_help_modal'
 
       .row.mt-3
         .col-auto
           = render 'table_pagination'
         .col-auto
           .form-group.row
-            %label.col-form-label{:for => "itemsPerPageCountSelect"} Test runs per page
+            %label.col-form-label{:for => "itemsPerPageCountSelect"} Performance test runs per page
             .col
               %select#itemsPerPageCountSelect.form-control.form-control{'data-items-per-page-count' => 20}
                 %option{value: 5} 5
@@ -105,11 +96,9 @@
         .col-auto
           .form-group.row
             %label#totalCount.col-form-label
-              = '(Total count: ' + @filtered_test_runs_count.to_s + ')'
+              = '(Total count: ' + @filtered_performance_test_runs_count.to_s + ')'
       .row
         .col
           #main-table-container
-            = render 'filters/result_table'
-
-
+            = render 'filters/performance_test_result_table'
 
