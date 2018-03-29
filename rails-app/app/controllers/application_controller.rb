@@ -140,7 +140,7 @@ class ApplicationController < ActionController::Base
     tests_filter = filter_tests_to_sql('results.test', selected_filters_values[:tests_names])
 
     filter_test_run_str =
-        "SELECT results.test, results.result, filter_test_run.* "\
+        "SELECT results.test, results.result, results.core_dump_path, filter_test_run.* "\
       "FROM results "\
       "INNER JOIN "\
       "  (#{test_run_filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}) "\
