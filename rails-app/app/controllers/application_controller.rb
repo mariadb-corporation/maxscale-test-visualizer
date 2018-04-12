@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
         result << " (#{field} = #{range.to_i})"
       end
     end
-    result.join(' OR')
+    "(#{result.join(' OR')})"
   end
 
   # Generate the sql-query for the field by the selected values
