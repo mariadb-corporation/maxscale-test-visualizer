@@ -231,13 +231,10 @@ class ApplicationController < ActionController::Base
         "          SR.General_statistics_response_time_min, "\
         "          SR.General_statistics_total_number_of_events, "\
         "          SR.General_statistics_total_time, "\
-        "          SR.General_statistics_total_time_taken_by_event_execution, "\
-        "          SR.OLTP_test_statistics_other_operations, "\
         "          SR.OLTP_test_statistics_queries_performed_other, "\
         "          SR.OLTP_test_statistics_queries_performed_read, "\
         "          SR.OLTP_test_statistics_queries_performed_total, "\
         "          SR.OLTP_test_statistics_queries_performed_write, "\
-        "          SR.OLTP_test_statistics_read_write_requests, "\
         "          SR.OLTP_test_statistics_reconnects, "\
         "          SR.OLTP_test_statistics_transactions, "\
         "          SR.Threads_fairness_events_avg, "\
