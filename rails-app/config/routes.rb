@@ -7,6 +7,9 @@ Rails.application.routes.draw do
   get 'performance_test_run', to: 'filters#test_results_for_performance_test_runs'
   post 'performance_test_run', to: 'filters#apply_performance_test_run_filters'
 
+  get 'performance_test_run_qps', to: 'filters#qps_results_for_performance_test_runs'
+  post 'performance_test_run_qps', to: 'filters#apply_performance_test_run_qps_filters'
+
   get 'mdbci_template', to: 'filters#mdbci_template'
   get 'maxscale_cnf', to: 'filters#maxscale_cnf'
 end

@@ -24,6 +24,7 @@ class ApplicationController < ActionController::Base
         result << " (#{field} = #{range.to_i})"
       end
     end
+    return '' if result.empty?
     "(#{result.join(' OR')})"
   end
 

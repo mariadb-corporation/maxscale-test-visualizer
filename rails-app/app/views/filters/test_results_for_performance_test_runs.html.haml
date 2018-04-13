@@ -4,7 +4,7 @@
       .row
         .card.width-100
           .card-body
-            %form#filtersForm.width-100{:action => performance_test_run_path, :method => "post", 'data-remote' => true}
+            %form#filtersForm.width-100{:action => @action_path, :method => "post", 'data-remote' => true}
               .row
                 .col
                   .form-group.row

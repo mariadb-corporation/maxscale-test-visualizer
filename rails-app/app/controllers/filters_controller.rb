@@ -7,7 +7,13 @@ class FiltersController < ApplicationController
 
   skip_before_action :verify_authenticity_token
   before_action :setup_selected_filters_values,
-                only: [:test_results_for_test_runs, :apply_test_run_filters, :generate_sql_for_displaying_on_page, :test_results_for_performance_test_runs, :apply_performance_test_run_filters]
+                only: [:test_results_for_test_runs,
+                       :apply_test_run_filters,
+                       :generate_sql_for_displaying_on_page,
+                       :test_results_for_performance_test_runs,
+                       :apply_performance_test_run_filters,
+                       :qps_results_for_performance_test_runs,
+                       :apply_performance_test_run_qps_filters]
 
   def test_results_for_test_runs
     @selected_filters_values[:hide_passed_tests] = 'true'
@@ -32,13 +38,17 @@ class FiltersController < ApplicationController
     render json: { sql_query: query }
   end
 
-  # Perfomance test runs
+  # Performance test runs
 
   def test_results_for_performance_test_runs
+    @mode = 'default'
     performance_test_run_main_filter
+    make_performance_test_run_query
+    @action_path = performance_test_run_path
   end
 
   def apply_performance_test_run_filters
+    @mode = 'default'
     make_performance_test_run_query
     render json: {
         partial: render_to_string(partial: 'filters/performance_test_result_table', layout: false),
@@ -47,7 +57,32 @@ class FiltersController < ApplicationController
         table_pages_count: @selected_filters_values[:table_pages_count],
         total_count: @filtered_performance_test_runs_count,
         query_error: @query_error,
-        flashes: render_to_string(partial: 'layouts/flashes', layout: false)
+        flashes: render_to_string(partial: 'layouts/flashes', layout: false),
+    }
+  end
+
+  # Performance test runs QPS
+
+  def qps_results_for_performance_test_runs
+    @mode = 'qps'
+    performance_test_run_main_filter
+    make_performance_test_run_query
+    @action_path = performance_test_run_qps_path
+
+    render 'filters/test_results_for_performance_test_runs'
+  end
+
+  def apply_performance_test_run_qps_filters
+    @mode = 'qps'
+    make_performance_test_run_query
+    render json: {
+        partial: render_to_string(partial: 'filters/performance_test_result_table', layout: false),
+        page_num: @selected_filters_values[:page_num],
+        table_columns_count: @selected_filters_values[:table_columns_count],
+        table_pages_count: @selected_filters_values[:table_pages_count],
+        total_count: @filtered_performance_test_runs_count,
+        query_error: @query_error,
+        flashes: render_to_string(partial: 'layouts/flashes', layout: false),
     }
   end
 
@@ -127,10 +162,10 @@ class FiltersController < ApplicationController
     @test_tool_options = PerformanceTestRun.test_tool_values
     @filter_page = 'PerformanceTestRun'
 
-    make_performance_test_run_query
+    # make_performance_test_run_query
   end
 
-  def make_performance_test_run_query
+  def make_performance_test_run_query()
     @query_error = false
 
     db = ActiveRecord::Base.establish_connection.connection
@@ -157,26 +192,33 @@ class FiltersController < ApplicationController
         @final_result << row
       end
 
-      @tests_names = ['OLTP_test_statistics_ignored_errors',
-                      'General_statistics_response_time_approx__95_percentile',
-                      'General_statistics_response_time_avg',
-                      'General_statistics_response_time_max',
-                      'General_statistics_response_time_min',
-                      'General_statistics_total_number_of_events',
-                      'General_statistics_total_time',
-                      'General_statistics_total_time_taken_by_event_execution',
-                      'OLTP_test_statistics_other_operations',
-                      'OLTP_test_statistics_queries_performed_other',
-                      'OLTP_test_statistics_queries_performed_read',
-                      'OLTP_test_statistics_queries_performed_total',
-                      'OLTP_test_statistics_queries_performed_write',
-                      'OLTP_test_statistics_read_write_requests',
-                      'OLTP_test_statistics_reconnects',
-                      'OLTP_test_statistics_transactions',
-                      'Threads_fairness_events_avg',
-                      'Threads_fairness_events_stddev',
-                      'Threads_fairness_execution_time_avg',
-                      'Threads_fairness_execution_time_stddev']
+      if @mode == 'default'
+        @tests_names = ['OLTP_test_statistics_ignored_errors',
+                        'General_statistics_response_time_approx__95_percentile',
+                        'General_statistics_response_time_avg',
+                        'General_statistics_response_time_max',
+                        'General_statistics_response_time_min',
+                        'General_statistics_total_number_of_events',
+                        'General_statistics_total_time',
+                        'General_statistics_total_time_taken_by_event_execution',
+                        'OLTP_test_statistics_other_operations',
+                        'OLTP_test_statistics_queries_performed_other',
+                        'OLTP_test_statistics_queries_performed_read',
+                        'OLTP_test_statistics_queries_performed_total',
+                        'OLTP_test_statistics_queries_performed_write',
+                        'OLTP_test_statistics_read_write_requests',
+                        'OLTP_test_statistics_reconnects',
+                        'OLTP_test_statistics_transactions',
+                        'Threads_fairness_events_avg',
+                        'Threads_fairness_events_stddev',
+                        'Threads_fairness_execution_time_avg',
+                        'Threads_fairness_execution_time_stddev']
+      elsif @mode == 'qps'
+        @tests_names = ['OLTP_test_statistics_queries_performed_read',
+                        'OLTP_test_statistics_queries_performed_write',
+                        'OLTP_test_statistics_queries_performed_other',
+                        'OLTP_test_statistics_queries_performed_total']
+      end
     else
       @result_is_empty = true
       @tests_names = []

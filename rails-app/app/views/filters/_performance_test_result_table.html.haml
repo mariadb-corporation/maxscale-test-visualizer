@@ -21,7 +21,10 @@
 
           - @final_result.each do |test_run|
             %td.text-center
-              = test_run[test_name]
+              - if @mode == 'default'
+                = test_run[test_name]
+              - elsif @mode == 'qps'
+                = (test_run[test_name].to_f / test_run['General_statistics_total_time'].to_f).round(2)
 
 - if !@result_is_empty.nil? && @result_is_empty
   %strong.row.justify-content-center.text-muted
