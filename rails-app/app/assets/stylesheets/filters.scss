@@ -29,3 +29,13 @@
 .v-align-top {
   vertical-align: top !important;
 }
+
+.table-cell-collapse-btn {
+  width: 100%;
+  line-height: 5px;
+}
+
+.table-cell-collapse {
+  max-height: 150px;
+  overflow: auto;
+}

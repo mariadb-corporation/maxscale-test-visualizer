@@ -105,7 +105,7 @@ class ApplicationController < ActionController::Base
       time_interval_finish = model.last_date
       time_interval_start = model.last_date - selected_filters_values[:time_interval_dropdown].days
       result << time_interval_to_sql('start_time', time_interval_start, time_interval_finish)
-    elsif selected_filters_values[:time_interval_dropdown] == 0 &&
+    elsif selected_filters_values[:time_interval_dropdown] == -2 &&
           !selected_filters_values[:time_interval_start].nil? &&
           !selected_filters_values[:time_interval_finish].nil?
       time_interval_start = model.last_date
@@ -220,10 +220,12 @@ class ApplicationController < ActionController::Base
         "          PTR.test_tool, "\
         "          PTR.test_tool_version, "\
         "          PTR.product_under_test, "\
+        "          PTR.sysbench_threads, "\
         "          MP.target, "\
         "          MP.maxscale_commit_id, "\
         "          MP.maxscale_cnf, "\
         "          MP.maxscale_source, "\
+        "          MP.maxscale_cnf_file_name, "\
         "          SR.OLTP_test_statistics_ignored_errors, "\
         "          SR.General_statistics_response_time_approx__95_percentile, "\
         "          SR.General_statistics_response_time_avg, "\

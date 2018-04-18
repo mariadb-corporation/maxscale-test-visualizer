@@ -4,6 +4,7 @@ class FiltersController < ApplicationController
   add_flash_types :error
 
   DEFAULT_TEST_RUN_COUNT = 10
+  MAXSCALE_THREADS_REGEX = /.*threads=(\d*).*/
 
   skip_before_action :verify_authenticity_token
   before_action :setup_selected_filters_values,
@@ -13,7 +14,9 @@ class FiltersController < ApplicationController
                        :test_results_for_performance_test_runs,
                        :apply_performance_test_run_filters,
                        :qps_results_for_performance_test_runs,
-                       :apply_performance_test_run_qps_filters]
+                       :apply_performance_test_run_qps_filters,
+                       :results_for_performance_test_runs_axes,
+                       :apply_performance_test_run_axes_filters]
 
   def test_results_for_test_runs
     @selected_filters_values[:hide_passed_tests] = 'true'
@@ -82,9 +85,36 @@ class FiltersController < ApplicationController
         table_pages_count: @selected_filters_values[:table_pages_count],
         total_count: @filtered_performance_test_runs_count,
         query_error: @query_error,
-        flashes: render_to_string(partial: 'layouts/flashes', layout: false),
+        flashes: render_to_string(partial: 'layouts/flashes', layout: false)
     }
   end
+
+  # Performance test run with axes
+
+  def results_for_performance_test_runs_axes
+    @mode = 'default'
+    performance_test_run_axes_main_filter
+    make_performance_test_run_axes_query
+    @action_path = performance_test_run_axes_path
+  end
+
+  def apply_performance_test_run_axes_filters
+    @mode = 'default'
+    make_performance_test_run_axes_query
+    make_performance_test_run_axes_query
+    render json: {
+        partial: render_to_string(partial: 'filters/performance_test_axes_result_table', layout: false),
+        page_num: @selected_filters_values[:page_num],
+        table_columns_count: @selected_filters_values[:table_columns_count],
+        table_pages_count: @selected_filters_values[:table_pages_count],
+        total_count: @filtered_performance_test_runs_count,
+        query_error: @query_error,
+        flashes: render_to_string(partial: 'layouts/flashes', layout: false)
+    }
+
+  end
+
+  # -----------------------
 
   def mdbci_template
     res = PerformanceTestRun.where('jenkins_id' => params[:jenkins_id]).first
@@ -223,6 +253,85 @@ class FiltersController < ApplicationController
     end
   end
 
+  # Performance test run with axes
+
+  def performance_test_run_axes_main_filter
+    @params = params
+
+    # Values for the form elements
+    @maxscale_source_options = MaxscaleParameter.maxscale_source_values
+    @dbms_options = PerformanceTestRun.dbms_values
+    @test_tool_options = PerformanceTestRun.test_tool_values
+    @filter_page = 'PerformanceTestRun'
+
+    if @selected_filters_values[:x_axis_name].nil?
+      @selected_filters_values[:x_axis_name] = 'maxscale_source'
+    end
+    if @selected_filters_values[:y_axis_name].nil?
+      @selected_filters_values[:y_axis_name] = 'maxscale_threads'
+    end
+    if @selected_filters_values[:target_field].nil?
+      @selected_filters_values[:target_field] = 'QPS_read'
+    end
+    if @selected_filters_values[:time_interval_dropdown].zero?
+      @selected_filters_values[:time_interval_dropdown] = 5
+    end
+    if @selected_filters_values[:filter_page].nil?
+      @selected_filters_values[:filter_page] = 'PerformanceTestRun'
+    end
+  end
+
+  def make_performance_test_run_axes_query
+    @query_error = false
+
+    db = ActiveRecord::Base.establish_connection.connection
+
+    begin
+      filtered_performance_test_runs = db.execute(performance_test_run_filters_to_sql(@selected_filters_values))
+      @filtered_performance_test_runs_count = filtered_performance_test_runs.count
+    rescue Exception => e
+      @query_error = true
+      flash.now[:error] = 'SQL query is invalid!'
+    end
+
+    if !@query_error && @filtered_performance_test_runs_count > 0
+      @final_result = []
+      filtered_performance_test_runs.each(:as => :hash) do |row|
+        begin
+          row['QPS_read'] = (row['OLTP_test_statistics_queries_performed_read'] / row['General_statistics_total_time']).round(2)
+          row['QPS_write'] = (row['OLTP_test_statistics_queries_performed_write'] / row['General_statistics_total_time']).round(2)
+          row['QPS_other'] = (row['OLTP_test_statistics_queries_performed_other'] / row['General_statistics_total_time']).round(2)
+          row['QPS_total'] = (row['OLTP_test_statistics_queries_performed_total'] / row['General_statistics_total_time']).round(2)
+        rescue Exception => e
+        end
+        if row['maxscale_cnf'] =~ MAXSCALE_THREADS_REGEX
+          row['maxscale_threads'] = row['maxscale_cnf'].match(MAXSCALE_THREADS_REGEX).captures[0]
+        end
+        @final_result << row
+      end
+    else
+      @result_is_empty = true
+      @tests_names = []
+      @final_result = []
+    end
+
+    @tests_names = ['QPS_read',
+                    'QPS_write',
+                    'QPS_other',
+                    'QPS_total']
+    @x_axis_name = @selected_filters_values[:x_axis_name] || 'maxscale_source'
+    @y_axis_name = @selected_filters_values[:y_axis_name] || 'maxscale_threads'
+    @x_axis_values = get_field_unique_values_from_array(@final_result, @x_axis_name)
+    @y_axis_values = get_field_unique_values_from_array(@final_result, @y_axis_name)
+    @target_field = @selected_filters_values[:target_field] || 'QPS_read'
+  end
+
+  def get_field_unique_values_from_array(array, field)
+    array.map{ |k| k[field] }.uniq
+  end
+
+  # --------------
+
   def setup_selected_filters_values
     @selected_filters_values = {
         mariadb_version: params['mariadb_version'],
@@ -240,7 +349,10 @@ class FiltersController < ApplicationController
         time_interval_finish: params['time_interval_finish'],
         dbms: params['dbms'],
         test_tool: params['test_tool'],
-        filter_page: params['filter_page']
+        filter_page: params['filter_page'],
+        x_axis_name: params['x_axis_dropdown'],
+        y_axis_name: params['y_axis_dropdown'],
+        target_field: params['target_field_dropdown']
     }
 
     if @selected_filters_values[:page_num].zero?

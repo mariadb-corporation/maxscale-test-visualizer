@@ -1,0 +1,38 @@
+.sticky-table.sticky-headers.sticky-ltr-cells
+  .loader-container
+    = render 'layouts/loader_indicator'
+  %table#main-table.table-bordered.table.table-sm{pagination: "true", 'rows-count' => @y_axis_values.size}
+    %thead
+      %tr.sticky-row
+        %th.sticky-cell.v-align-middle{:scope => "col"}
+          = "#{@y_axis_name} \\ #{@x_axis_name}"
+        - @x_axis_values.each do |x_value|
+          %th.text-center.v-align-top{:scope => "col"}
+            = x_value
+    %tbody
+      - @y_axis_values.each_with_index do |y_value, y_index|
+        %tr
+          %th.sticky-cell{:scope => "row"}
+            = y_value
+
+          - @x_axis_values.each_with_index do |x_value, x_index|
+            %td.text-center
+              - cell = @final_result.select{|row| row[@x_axis_name] == x_value && row[@y_axis_name] == y_value}
+              - if !cell.nil? && !cell.empty?
+                - cell.sort_by!{|x| x[:start_time]}
+                - last_value = cell.pop
+                %button.btn.btn-link.simple-link{"data-content" => performance_test_run_info(last_value), "data-toggle" => "popover", "data-placement" => "bottom", :title => "Info", :type => "button"}
+                  = last_value[@target_field] || '━'
+                - if !cell.empty?
+                  %br
+                  %button.btn.btn-sm.table-cell-collapse-btn{:type => 'button', 'data-toggle' => 'collapse', 'data-target' => "#cellCollapse_#{y_index}_#{x_index}", 'aria-expanded' => "false", 'aria-controls' => "#cellCollapse_#{y_index}_#{x_index}"}
+                    ⯆
+                  .collapse.multi-collapse.table-cell-collapse{:id => "cellCollapse_#{y_index}_#{x_index}"}
+                    - cell.each do |cell_value|
+                      %button.btn.btn-link.simple-link{"data-content" => performance_test_run_info(cell_value), "data-toggle" => "popover", "data-placement" => "bottom", :title => "Info", :type => "button"}
+                        = cell_value[@target_field] || '━'
+                      %br
+
+- if !@result_is_empty.nil? && @result_is_empty
+  %strong.row.justify-content-center.text-muted
+    No results found

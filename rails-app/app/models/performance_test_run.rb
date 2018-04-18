@@ -22,6 +22,10 @@ class PerformanceTestRun < ApplicationRecord
     res
   end
 
+  def self.sysbench_threads_values
+    query = select('sysbench_threads').group('sysbench_threads')
+  end
+
   def self.last_date
     select('start_time').order(start_time: :desc).first.start_time
   end

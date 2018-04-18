@@ -24,7 +24,7 @@
               - if @mode == 'default'
                 = test_run[test_name]
               - elsif @mode == 'qps'
-                = (test_run[test_name].to_f / test_run['General_statistics_total_time'].to_f).round(2)
+                = (test_run[test_name] / test_run['General_statistics_total_time']).round(2)
 
 - if !@result_is_empty.nil? && @result_is_empty
   %strong.row.justify-content-center.text-muted

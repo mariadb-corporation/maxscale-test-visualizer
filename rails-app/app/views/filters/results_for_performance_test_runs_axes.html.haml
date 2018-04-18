@@ -46,8 +46,8 @@
                       %select#time_interval_dropdown.form-control.form-control{:name => "time_interval_dropdown"}
                         %option{value: 1} 1 day
                         %option{value: 2} 2 days
-                        %option{value: 5} 5 days
-                        %option{value: -1, selected: true} All time
+                        %option{value: 5, selected: true} 5 days
+                        %option{value: -1} All time
                         %option{value: -2} Set interval
                   .form-group.row#time_interval_form
                     .col-3
@@ -56,6 +56,42 @@
                     .col
                       %input#time_interval_finish.form-control{:placeholder => "", :type => "date", :name => "time_interval_finish", :value => @selected_filters_values[:time_interval_finish]}
 
+
+                  .form-group.row
+                    .col-4
+                      .col
+                        %label{:for => "x_axis_dropdown"} X-Axis
+                      .col
+                        %select#x_axis_dropdown.form-control.form-control{:name => "x_axis_dropdown"}
+                          %option{value: 'maxscale_cnf_file_name', selected: option_selected?('maxscale_cnf_file_name', @selected_filters_values[:x_axis_name])}
+                            Maxscale config file
+                          %option{value: 'maxscale_source', selected: option_selected?('maxscale_source', @selected_filters_values[:x_axis_name])}
+                            Maxscale source
+                          %option{value: 'maxscale_threads', selected: option_selected?('maxscale_threads', @selected_filters_values[:x_axis_name])}
+                            Maxscale threads
+                          %option{value: 'sysbench_threads', selected: option_selected?('sysbench_threads', @selected_filters_values[:x_axis_name])}
+                            Sysbench threads
+                    .col-4
+                      .col
+                        %label{:for => "y_axis_dropdown"} Y-Axis
+                      .col
+                        %select#y_axis_dropdown.form-control.form-control{:name => "y_axis_dropdown"}
+                          %option{value: 'maxscale_cnf_file_name', selected: option_selected?('maxscale_cnf_file_name', @selected_filters_values[:y_axis_name])}
+                            Maxscale config file
+                          %option{value: 'maxscale_source', selected: option_selected?('maxscale_source', @selected_filters_values[:y_axis_name])}
+                            Maxscale source
+                          %option{value: 'maxscale_threads', selected: option_selected?('maxscale_threads', @selected_filters_values[:y_axis_name])}
+                            Maxscale threads
+                          %option{value: 'sysbench_threads', selected: option_selected?('sysbench_threads', @selected_filters_values[:y_axis_name])}
+                            Sysbench threads
+                    .col-4
+                      .col
+                        %label{:for => "target_field_dropdown"} Value
+                      .col
+                        %select#target_field_dropdown.form-control.form-control{:name => "target_field_dropdown"}
+                          - @tests_names.each do |test_name|
+                            %option{value: test_name, selected: option_selected?(test_name, @selected_filters_values[:target_field])}
+                              = test_name
 
                 .col
                   #flashesContainer
@@ -71,34 +107,12 @@
 
               / row with hidden fields (for pagination)
               .row
-                %input#pageNum.form-control{:type => 'hidden', :name => "page_num", :value => @selected_filters_values[:page_num]}
-                %input#tableColumnsCount.form-control{:type => 'hidden', :name => "table_columns_count", :value => @selected_filters_values[:table_columns_count]}
-                %input#tablePagesCount.form-control{:type => 'hidden', :name => "table_pages_count", :value => @selected_filters_values[:table_pages_count]}
                 %input#filterPage.form-control{:type => 'hidden', :name => "filter_page", :value => @filter_page}
 
               .row.align-items-center
                 .col
                   %button#submitButton.btn.btn-primary.btn-block{:type => "submit"} Submit
-
-      .row.mt-3
-        .col-auto
-          = render 'table_pagination'
-        .col-auto
-          .form-group.row
-            %label.col-form-label{:for => "itemsPerPageCountSelect"} Performance test runs per page
-            .col
-              %select#itemsPerPageCountSelect.form-control.form-control{'data-items-per-page-count' => 20}
-                %option{value: 5} 5
-                %option{value: 10} 10
-                %option{value: 20} 20
-                %option{value: 30} 30
-                %option{value: 50} 50
-        .col-auto
-          .form-group.row
-            %label#totalCount.col-form-label
-              = '(Total count: ' + @filtered_performance_test_runs_count.to_s + ')'
       .row
         .col
           #main-table-container
-            = render 'filters/performance_test_result_table'
-
+            = render 'filters/performance_test_axes_result_table'
