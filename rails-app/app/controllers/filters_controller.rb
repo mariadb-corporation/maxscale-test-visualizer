@@ -4,7 +4,6 @@ class FiltersController < ApplicationController
   add_flash_types :error
 
   DEFAULT_TEST_RUN_COUNT = 10
-  MAXSCALE_THREADS_REGEX = /.*threads=(\d*).*/
 
   skip_before_action :verify_authenticity_token
   before_action :setup_selected_filters_values,
@@ -303,9 +302,6 @@ class FiltersController < ApplicationController
           row['QPS_other'] = (row['OLTP_test_statistics_queries_performed_other'] / row['General_statistics_total_time']).round(2)
           row['QPS_total'] = (row['OLTP_test_statistics_queries_performed_total'] / row['General_statistics_total_time']).round(2)
         rescue Exception => e
-        end
-        if row['maxscale_cnf'] =~ MAXSCALE_THREADS_REGEX
-          row['maxscale_threads'] = row['maxscale_cnf'].match(MAXSCALE_THREADS_REGEX).captures[0]
         end
         @final_result << row
       end

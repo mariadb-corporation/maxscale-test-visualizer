@@ -226,6 +226,7 @@ class ApplicationController < ActionController::Base
         "          MP.maxscale_cnf, "\
         "          MP.maxscale_source, "\
         "          MP.maxscale_cnf_file_name, "\
+        "          MP.maxscale_threads, "\
         "          SR.OLTP_test_statistics_ignored_errors, "\
         "          SR.General_statistics_response_time_approx__95_percentile, "\
         "          SR.General_statistics_response_time_avg, "\
