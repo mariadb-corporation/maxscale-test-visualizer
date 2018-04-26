@@ -26,4 +26,14 @@ $(document).ready(function () {
         placeholder: "Select a product version",
         width: '100%'
     });
+    $("#maxscale_threads_select").select2({
+        theme: "bootstrap",
+        placeholder: "Select a maxscale threads",
+        width: '100%'
+    });
+    $("#sysbench_threads_select").select2({
+        theme: "bootstrap",
+        placeholder: "Select a sysbench threads",
+        width: '100%'
+    });
 });

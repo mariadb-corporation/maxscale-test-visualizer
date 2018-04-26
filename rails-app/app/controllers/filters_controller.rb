@@ -100,7 +100,6 @@ class FiltersController < ApplicationController
   def apply_performance_test_run_axes_filters
     @mode = 'default'
     make_performance_test_run_axes_query
-    make_performance_test_run_axes_query
     render json: {
         partial: render_to_string(partial: 'filters/performance_test_axes_result_table', layout: false),
         page_num: @selected_filters_values[:page_num],
@@ -189,6 +188,8 @@ class FiltersController < ApplicationController
     @maxscale_source_options = MaxscaleParameter.maxscale_source_values
     @dbms_options = PerformanceTestRun.dbms_values
     @test_tool_options = PerformanceTestRun.test_tool_values
+    @maxscale_threads_options = MaxscaleParameter.maxscale_threads_values
+    @sysbench_threads_options = PerformanceTestRun.sysbench_threads_values
     @filter_page = 'PerformanceTestRun'
 
     # make_performance_test_run_query
@@ -261,6 +262,8 @@ class FiltersController < ApplicationController
     @maxscale_source_options = MaxscaleParameter.maxscale_source_values
     @dbms_options = PerformanceTestRun.dbms_values
     @test_tool_options = PerformanceTestRun.test_tool_values
+    @maxscale_threads_options = MaxscaleParameter.maxscale_threads_values
+    @sysbench_threads_options = PerformanceTestRun.sysbench_threads_values
     @filter_page = 'PerformanceTestRun'
 
     if @selected_filters_values[:x_axis_name].nil?
@@ -318,7 +321,9 @@ class FiltersController < ApplicationController
     @x_axis_name = @selected_filters_values[:x_axis_name] || 'maxscale_source'
     @y_axis_name = @selected_filters_values[:y_axis_name] || 'maxscale_threads'
     @x_axis_values = get_field_unique_values_from_array(@final_result, @x_axis_name)
+    @x_axis_values.sort! { |a,b| a && b ? a <=> b : a ? -1 : 1 } unless @x_axis_values.nil?
     @y_axis_values = get_field_unique_values_from_array(@final_result, @y_axis_name)
+    @y_axis_values.sort! { |a,b| a && b ? a <=> b : a ? -1 : 1 } unless @y_axis_values.nil?
     @target_field = @selected_filters_values[:target_field] || 'QPS_read'
   end
 
@@ -345,6 +350,8 @@ class FiltersController < ApplicationController
         time_interval_finish: params['time_interval_finish'],
         dbms: params['dbms'],
         test_tool: params['test_tool'],
+        maxscale_threads: params['maxscale_threads'],
+        sysbench_threads: params['sysbench_threads'],
         filter_page: params['filter_page'],
         x_axis_name: params['x_axis_dropdown'],
         y_axis_name: params['y_axis_dropdown'],

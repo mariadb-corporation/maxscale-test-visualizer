@@ -7,6 +7,10 @@ class MaxscaleParameter < ApplicationRecord
     select('maxscale_source').group('maxscale_source')
   end
 
+  def self.maxscale_threads_values
+    select('maxscale_threads').group('maxscale_threads')
+  end
+
   def self.maxscale_cnf_file_name_values
     select('maxscale_cnf_file_name').group('maxscale_cnf_file_name')
   end

@@ -36,6 +36,24 @@
                             = maxscale_source.maxscale_source
                   .form-group.row
                     .col-3
+                      %label{:for => "maxscale_threads_select"} Maxscale threads
+                    .col
+                      %select#maxscale_threads_select.form-control{:multiple => "multiple", :name => "maxscale_threads[]"}
+                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:maxscale_threads])} All
+                        - @maxscale_threads_options.each do |maxscale_threads|
+                          %option{:value => maxscale_threads.maxscale_threads, :selected => option_selected?(maxscale_threads.maxscale_threads, @selected_filters_values[:maxscale_threads])}
+                            = maxscale_threads.maxscale_threads
+                  .form-group.row
+                    .col-3
+                      %label{:for => "sysbench_threads_select"} Sysbench threads
+                    .col
+                      %select#sysbench_threads_select.form-control{:multiple => "multiple", :name => "sysbench_threads[]"}
+                        %option{:value => "All", :selected => option_selected?("All", @selected_filters_values[:sysbench_threads])} All
+                        - @sysbench_threads_options.each do |sysbench_threads|
+                          %option{:value => sysbench_threads.sysbench_threads, :selected => option_selected?(sysbench_threads.sysbench_threads, @selected_filters_values[:sysbench_threads])}
+                            = sysbench_threads.sysbench_threads
+                  .form-group.row
+                    .col-3
                       %label{:for => "jenkins_build_input"} Test run (Jenkins build id)
                     .col
                       %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @selected_filters_values[:jenkins_build]}

@@ -76,6 +76,8 @@ module FiltersHelper
     "<b>Test tool version:</b> #{test_run['test_tool_version']} <br>"\
     "<b>Product under test:</b> #{test_run['product_under_test']} <br>"\
     "<b>Maxscale source:</b> #{test_run['maxscale_source']} <br>"\
+    "<b>Maxscale threads:</b> #{test_run['maxscale_threads']} <br>"\
+    "<b>Sysbench threads:</b> #{test_run['sysbench_threads']} <br>"\
     "<b>Maxscale commit:</b> <a href='#{commit_url(test_run['maxscale_commit_id'])}'>#{test_run['maxscale_commit_id']}</a> <br>"\
     "<b>Logs:</b> <a href='#{logs_url_for_performance_test_run(test_run['jenkins_id'])}'>#{test_run['jenkins_id']}</a> <br>"\
     "<b>MBCI template:</b> <a href=#{mdbci_template_path(jenkins_id: test_run['jenkins_id'])}>Template</a> <br>"\

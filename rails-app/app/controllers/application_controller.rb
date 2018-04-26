@@ -94,6 +94,12 @@ class ApplicationController < ActionController::Base
     test_tool = field_with_version_to_sql(selected_filters_values[:test_tool], 'test_tool', 'test_tool_version', 'All')
     result << "(#{test_tool})" unless test_tool.empty?
 
+    maxscale_threads = filter_field_to_sql(:maxscale_threads, selected_filters_values, 'All')
+    result << maxscale_threads unless maxscale_threads.empty?
+
+    sysbench_threads = filter_field_to_sql(:sysbench_threads, selected_filters_values, 'All')
+    result << sysbench_threads unless sysbench_threads.empty?
+
 
     # time intervals
     if selected_filters_values[:filter_page] == 'TestRun'
