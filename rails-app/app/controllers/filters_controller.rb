@@ -219,6 +219,13 @@ class FiltersController < ApplicationController
 
       @final_result = []
       query_result.each(:as => :hash) do |row|
+        begin
+          row['QPS_read'] = (row['OLTP_test_statistics_queries_performed_read'] / row['General_statistics_total_time']).round(2)
+          row['QPS_write'] = (row['OLTP_test_statistics_queries_performed_write'] / row['General_statistics_total_time']).round(2)
+          row['QPS_other'] = (row['OLTP_test_statistics_queries_performed_other'] / row['General_statistics_total_time']).round(2)
+          row['QPS_total'] = (row['OLTP_test_statistics_queries_performed_total'] / row['General_statistics_total_time']).round(2)
+        rescue Exception => e
+        end
         @final_result << row
       end
 
@@ -241,10 +248,10 @@ class FiltersController < ApplicationController
                         'Threads_fairness_execution_time_avg',
                         'Threads_fairness_execution_time_stddev']
       elsif @mode == 'qps'
-        @tests_names = ['OLTP_test_statistics_queries_performed_read',
-                        'OLTP_test_statistics_queries_performed_write',
-                        'OLTP_test_statistics_queries_performed_other',
-                        'OLTP_test_statistics_queries_performed_total']
+        @tests_names = ['QPS_read',
+                        'QPS_write',
+                        'QPS_other',
+                        'QPS_total']
       end
     else
       @result_is_empty = true
