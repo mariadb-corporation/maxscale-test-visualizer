@@ -47,7 +47,7 @@ class ApplicationController < ActionController::Base
     else
       res = []
       values.each do |value|
-        res << "(#{field_name} = '#{value.split(' ').first}' AND #{field_version_name} = '#{value.split(' ')[1..-1].join(' ')}')"
+        res << "(#{field_name} = '#{value.split(', ').first}' AND #{field_version_name} = '#{value.split(', ')[1..-1].join(' ')}')"
       end
       res.join(' OR ')
     end

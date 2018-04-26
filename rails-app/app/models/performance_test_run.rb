@@ -8,7 +8,7 @@ class PerformanceTestRun < ApplicationRecord
     query = select('product, mariadb_version').group('product, mariadb_version')
     res = []
     query.each do |row|
-      res << "#{row['product']} #{row['mariadb_version']}"
+      res << "#{row['product']}, #{row['mariadb_version']}"
     end
     res
   end
@@ -17,7 +17,7 @@ class PerformanceTestRun < ApplicationRecord
     query = select('test_tool, test_tool_version').group('test_tool, test_tool_version')
     res = []
     query.each do |row|
-      res << "#{row['test_tool']} #{row['test_tool_version']}"
+      res << "#{row['test_tool']}, #{row['test_tool_version']}"
     end
     res
   end
