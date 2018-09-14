@@ -54,9 +54,9 @@
                             = sysbench_threads.sysbench_threads
                   .form-group.row
                     .col-3
-                      %label{:for => "jenkins_build_input"} Test run (Jenkins build id)
+                      %label{:for => "id_input"} Test run (id)
                     .col
-                      %input#jenkins_build_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "jenkins_build", :value => @selected_filters_values[:jenkins_build]}
+                      %input#id_input.form-control{:placeholder => "Example: 5-6, 10-12, 15", :type => "text", :name => "id", :value => @selected_filters_values[:id]}
                   .form-group.row
                     .col-3
                       %label{:for => "time_interval_dropdown"} Time interval

@@ -48,6 +48,7 @@ module FiltersHelper
   end
 
   def test_run_info(test_run)
+    "<b>id:</b> #{test_run['id']} <br>"\
     "<b>Jenkins id:</b> #{test_run['jenkins_id']} <br>"\
     "<b>Start time:</b> #{test_run['start_time']} <br>"\
     "<b>Target:</b> #{test_run['target']} <br>"\
@@ -62,6 +63,7 @@ module FiltersHelper
   end
 
   def performance_test_run_info(test_run)
+    "<b>id:</b> #{test_run['id']} <br>"\
     "<b>Jenkins id:</b> #{test_run['jenkins_id']} <br>"\
     "<b>Start time:</b> #{test_run['start_time']} <br>"\
     "<b>Target:</b> #{test_run['target']} <br>"\
@@ -80,8 +82,8 @@ module FiltersHelper
     "<b>Sysbench threads:</b> #{test_run['sysbench_threads']} <br>"\
     "<b>Maxscale commit:</b> <a href='#{commit_url(test_run['maxscale_commit_id'])}'>#{test_run['maxscale_commit_id']}</a> <br>"\
     "<b>Logs:</b> <a href='#{logs_url_for_performance_test_run(test_run['jenkins_id'])}'>#{test_run['jenkins_id']}</a> <br>"\
-    "<b>MBCI template:</b> <a href=#{mdbci_template_path(jenkins_id: test_run['jenkins_id'])}>Template</a> <br>"\
-    "<b>Maxscale config:</b> <a href=#{maxscale_cnf_path(jenkins_id: test_run['jenkins_id'])}>Config</a> <br>"
+    "<b>MBCI template:</b> <a href=#{mdbci_template_path(id: test_run['id'])}>Template</a> <br>"\
+    "<b>Maxscale config:</b> <a href=#{maxscale_cnf_path(id: test_run['id'])}>Config</a> <br>"
   end
 
   def test_result(final_result, test_run, test_name)

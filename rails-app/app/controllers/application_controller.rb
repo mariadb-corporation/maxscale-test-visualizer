@@ -85,8 +85,8 @@ class ApplicationController < ActionController::Base
     box = filter_field_to_sql(:box, selected_filters_values, 'All')
     result << box unless box.empty?
 
-    jenkins_id = ranges_string_to_sql('jenkins_id', selected_filters_values[:jenkins_build])
-    result << jenkins_id unless jenkins_id.empty?
+    id = ranges_string_to_sql('id', selected_filters_values[:id])
+    result << id unless id.empty?
 
     dbms = field_with_version_to_sql(selected_filters_values[:dbms], 'product', 'mariadb_version', 'All')
     result << "(#{dbms})" unless dbms.empty?

@@ -8,7 +8,7 @@
         - @final_result.each do |test_run|
           %th.text-center.v-align-top{:scope => "col"}
             %button.btn.btn-link.simple-link{"data-content" => performance_test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
-              = test_run['jenkins_id']
+              = test_run['id']
             .xx-small-font
               = test_run['maxscale_source']
               %br

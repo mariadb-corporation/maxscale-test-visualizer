@@ -115,13 +115,12 @@ class FiltersController < ApplicationController
   # -----------------------
 
   def mdbci_template
-    res = PerformanceTestRun.where('jenkins_id' => params[:jenkins_id]).first
+    res = PerformanceTestRun.where('id' => params[:id]).first
     render plain: res['mdbci_template']
   end
 
   def maxscale_cnf
-    id = PerformanceTestRun.where('jenkins_id' => params[:jenkins_id]).first['id']
-    res = MaxscaleParameter.where('id' => id).first
+    res = MaxscaleParameter.where('id' => params[:id]).first
     render plain: res['maxscale_cnf']
   end
 
@@ -345,7 +344,7 @@ class FiltersController < ApplicationController
         mariadb_version: params['mariadb_version'],
         maxscale_source: params['maxscale_source'],
         box: params['box'],
-        jenkins_build: params['jenkins_build'],
+        id: params['id'],
         tests_names: params['tests_names'],
         hide_passed_tests: params['hide_passed_tests'],
         use_sql_query: params['use_sql_query'],
