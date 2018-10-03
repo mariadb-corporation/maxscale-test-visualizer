@@ -190,6 +190,7 @@ class ApplicationController < ActionController::Base
   # Limit and offset for the sql-query for the test_runs that are located on the table page
   def calc_limit_and_offset(test_runs_count, columns_count, page_num)
     modulo = test_runs_count % columns_count
+    modulo = columns_count if modulo == 0
 
     if page_num == 1
       limit = modulo
