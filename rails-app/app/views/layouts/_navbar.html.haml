@@ -2,9 +2,17 @@
   %a.navbar-brand{:href => root_path} Maxscale test visualizer
   %button.navbar-toggler{"aria-controls" => "navbarNavAltMarkup", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#navbarNavAltMarkup", "data-toggle" => "collapse", :type => "button"}
     %span.navbar-toggler-icon
-  #navbarNavAltMarkup.collapse.navbar-collapse
+  #navbarNavAltMarkup.collapse.navbar-collapse.mr-auto
     .navbar-nav
       %a.nav-item.nav-link{:href => test_run_path, :class => "#{'active' if current_page?(test_run_path)}"} Test run
       %a.nav-item.nav-link{:href => performance_test_run_path, :class => "#{'active' if current_page?(performance_test_run_path)}"} Performance test run
       %a.nav-item.nav-link{:href => performance_test_run_qps_path, :class => "#{'active' if current_page?(performance_test_run_qps_path)}"} Performance test run QPS
       %a.nav-item.nav-link{:href => performance_test_run_axes_path, :class => "#{'active' if current_page?(performance_test_run_axes_path)}"} Performance test run with axes
+  - unless current_user.nil?
+    .profile
+      .btn-group
+        %button.btn.dropdown-toggle{ type: :button, 'data-toggle': 'dropdown', 'aria-haspopup': true, 'aria-expanded': false }
+          %img.mr-1{ src: current_user.image, height: 30 }
+          = current_user.name
+        .dropdown-menu
+          = link_to "Sign out", destroy_user_session_path, class: 'dropdown-item', method: :delete

@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+
+  devise_for :users, :controllers => { :omniauth_callbacks => 'omniauth_callbacks' }, :path => '/'
+  devise_scope :user do
+    delete 'sign_out', :to => 'devise/sessions#destroy', :as => :destroy_user_session
+  end
+
   get 'test_run', to: 'filters#test_results_for_test_runs'
   post 'test_run', to: 'filters#apply_test_run_filters'
   post 'generate_user_sql_query_by_filters', to: 'filters#generate_sql_for_displaying_on_page'

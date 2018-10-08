@@ -13,4 +13,9 @@
     %link{ href: 'https://fonts.googleapis.com/css?family=Roboto+Mono', rel: 'stylesheet' }
   %body
     = render 'layouts/navbar'
-    = yield
+
+    - if user_signed_in?
+      = yield
+    - else
+      .signin-wrapper
+        = link_to "Sign in with GitHub", user_github_omniauth_authorize_path, class: 'btn btn-primary'
