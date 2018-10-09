@@ -2,6 +2,7 @@
 
 class FiltersController < ApplicationController
   add_flash_types :error
+  before_action :authenticate_user
 
   DEFAULT_TEST_RUN_COUNT = 10
 

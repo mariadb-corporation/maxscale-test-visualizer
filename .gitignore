@@ -10,6 +10,7 @@ capybara-*.html
 /rails-app/spec/tmp
 /rails-app/config/database.yml
 /rails-app/config/application.yml
+/rails-app/config/settings.yml
 *.orig
 rerun.txt
 pickle-email-*.html

@@ -10,4 +10,8 @@ class User < ApplicationRecord
       user.nickname = auth.info.nickname
     end
   end
+
+  def has_access?
+    Settings.authorization.users.include? nickname
+  end
 end

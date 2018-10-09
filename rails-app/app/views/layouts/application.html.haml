@@ -15,7 +15,10 @@
     = render 'layouts/navbar'
 
     - if user_signed_in?
-      = yield
+      - if current_user.has_access?
+        = yield
+      - unless @auth_error.nil?
+        .main-page-wrapper.access-error-message= @auth_error
     - else
-      .signin-wrapper
+      .main-page-wrapper
         = link_to "Sign in with GitHub", user_github_omniauth_authorize_path, class: 'btn btn-primary'

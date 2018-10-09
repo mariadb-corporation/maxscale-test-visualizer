@@ -274,4 +274,11 @@ class ApplicationController < ActionController::Base
   def is_i?(str)
     str.to_i.to_s == str
   end
+
+  def authenticate_user
+    if !user_signed_in? || !current_user.has_access?
+      @auth_error = 'You do not have access rights'
+      return ''
+    end
+  end
 end

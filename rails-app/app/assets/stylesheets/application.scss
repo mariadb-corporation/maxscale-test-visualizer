@@ -6,8 +6,12 @@
 @import "select2-bootstrap";
 @import "jquery.stickytable";
 
-.signin-wrapper {
+.main-page-wrapper {
   width: 100%;
   padding: 100px 0;
   text-align: center;
+}
+
+.access-error-message {
+  font-size: 18px;
 }
