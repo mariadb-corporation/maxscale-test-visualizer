@@ -73,6 +73,13 @@ template "#{application_path}/config/database.yml" do
   owner user_name
 end
 
+# Setup application configuration for GitHub authentication
+template "#{application_path}/config/application.yml" do
+  source 'application.yml.erb'
+  mode '0644'
+  owner user_name
+end
+
 # Install bundler to manage dependencies
 rbenv_gem 'bundler' do
   rbenv_version ruby_version
