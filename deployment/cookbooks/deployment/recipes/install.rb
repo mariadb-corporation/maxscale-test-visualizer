@@ -104,7 +104,7 @@ rbenv_script 'Publish all assets' do
   rbenv_version ruby_version
   user user_name
   cwd application_path
-  environment ({ 'RAILS_ENV' => 'production'})
+  environment({ 'RAILS_ENV' => 'production', 'SECRET_KEY_BASE' => rails_secret})
   code 'rails assets:precompile'
 end
 
