@@ -80,6 +80,14 @@ template "#{application_path}/config/application.yml" do
   owner user_name
 end
 
+# Setup apache2 to use special port
+cookbook_file "#{application_path}/config/settings.yml" do
+  action :create_if_missing
+  source 'settings.yml'
+  mode '0644'
+  owner user_name
+end
+
 # Install bundler to manage dependencies
 rbenv_gem 'bundler' do
   rbenv_version ruby_version
