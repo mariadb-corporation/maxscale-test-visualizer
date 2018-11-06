@@ -24,6 +24,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+# Installing the current version of NodeJs
+include_recipe "nodejs"
+
 user_name = node['user_name']
 application_name = node['application_name']
 repo_path = node['repo_path']
@@ -84,7 +87,10 @@ when 'debian'
 when 'rhel'
   package 'mysql-devel'
 end
-package 'nodejs' # Use it to compile JS assets
+# Use it to compile JS assets
+package 'nodejs' do
+  action :upgrade
+end
 
 # Install all gems that are required by the application
 rbenv_script 'Install required gem files' do

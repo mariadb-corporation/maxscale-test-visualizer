@@ -13,3 +13,4 @@ supports 'ubuntu'
 # List of dependencies for the current cookbook
 
 depends 'ruby_rbenv'
+depends 'nodejs'
