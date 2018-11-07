@@ -153,37 +153,32 @@ systemd_unit "#{application_name}.service" do
 end
 
 # Configure apache2 to proxy all calls to the puma or static files
-package 'apache2'
+package 'nginx'
 
-# Setup apache2 to use special port
-cookbook_file '/etc/apache2/ports.conf' do
-  source 'apache-ports.conf'
+template "/etc/nginx/sites-available/#{application_name}" do
+  source 'nginx-site.conf.erb'
   mode '0644'
   owner 'root'
   group 'root'
 end
 
-# Add virtual host configuration
-template "/etc/apache2/sites-available/#{application_name}.conf" do
-  source 'apache-site.conf.erb'
-  mode '0644'
-  owner 'root'
-  group 'root'
+# Enable site configuration
+link "/etc/nginx/sites-enabled/#{application_name}" do
+  to "/etc/nginx/sites-available/#{application_name}"
 end
 
-execute 'Enable application side' do
-  command "/usr/sbin/a2ensite #{application_name}"
+if node['test_env']
+  file '/etc/nginx/snippets/ssl-params.conf' do
+    action :touch
+  end
 end
 
-execute 'Enable proxy module for Apache 2' do
-  command '/usr/sbin/a2enmod proxy'
-end
-
-execute 'Enable http proxy module for Apache 2' do
-  command '/usr/sbin/a2enmod proxy_http'
+# Check the nginx configuration file
+execute 'Check nginx configuration' do
+  command 'nginx -t'
 end
 
 # Reload apache configuration
-service 'apache2' do
+service 'nginx' do
   action :restart
 end

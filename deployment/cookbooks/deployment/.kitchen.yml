@@ -1,13 +1,9 @@
 ---
 driver:
   name: vagrant
-
-## The forwarded_port port feature lets you connect to ports on the VM guest via
-## localhost on the host.
-## see also: https://docs.vagrantup.com/v2/networking/forwarded_ports.html
-
-#  network:
-#    - ["forwarded_port", {guest: 80, host: 8080}]
+  customize:
+    memory: 2048
+    cpus: 4
 
 provisioner:
   name: chef_solo
@@ -22,7 +18,13 @@ verifier:
   name: inspec
 
 platforms:
-  - name: ubuntu-16.04
+  - name: ubuntu-18.04
+
+driver_config:
+  requre_chef_omnibus: true
+  network:
+  - ["forwarded_port", {guest: 80, host: 8080}]
+  - ["forwarded_port", {guest: 443, host: 443}]
 
 suites:
   - name: default
@@ -31,3 +33,5 @@ suites:
         - test/smoke/default
     run_list:
       - recipe[deployment::install]
+    attributes:
+      test_env: true
