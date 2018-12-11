@@ -171,6 +171,10 @@ if node['test_env']
   file '/etc/nginx/snippets/ssl-params.conf' do
     action :touch
   end
+
+  file '/etc/nginx/snippets/mariadb-net-ssl-cert.conf' do
+    action :touch
+  end
 end
 
 # Check the nginx configuration file

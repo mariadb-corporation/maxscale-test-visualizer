@@ -17,7 +17,7 @@ def parse_parameters
     ssh_user: '',
     ssh_server: '',
     chef_config: '',
-    chef_version: '13.7.16'
+    chef_version: '14.7.17'
   }
 
   parser = OptionParser.new do |opts|

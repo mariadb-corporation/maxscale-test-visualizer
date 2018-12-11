@@ -3,9 +3,9 @@ default: &default
   database: test_results_db
   username: <%= node['db']['username'] %>
   password: <%= node['db']['password'] %>
-  host: localhost
+  host: <%= node['db']['host'] %>
   encoding: utf8
-  port: "3306"
+  port: <%= node['db']['port'] %>
 
 production:
   <<: *default

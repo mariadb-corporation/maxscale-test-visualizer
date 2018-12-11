@@ -14,6 +14,7 @@ server {
   listen [::]:443 ssl http2;
 
   include snippets/ssl-params.conf;
+  include snippets/mariadb-net-ssl-cert.conf;
 
   server_name <%= node['domain_name'] %>;
 
