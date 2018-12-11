@@ -5,6 +5,7 @@ default['application_path'] = "#{node['repo_path']}/rails-app/"
 default['ruby_version'] = '2.5.3'
 default['application_repository'] = 'https://github.com/mariadb-corporation/maxscale-test-visualizer'
 default['domain_name'] = 'maxscale-test.mariadb.net'
+default['users'] = []
 # Attributes to install NodeJs on the target machine
 default['nodejs']['install_method'] = 'package'
 # Theese attributes ar likely to be changed for production

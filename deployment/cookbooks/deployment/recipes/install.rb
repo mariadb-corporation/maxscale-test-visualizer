@@ -80,10 +80,9 @@ template "#{application_path}/config/application.yml" do
   owner user_name
 end
 
-# Setup apache2 to use special port
-cookbook_file "#{application_path}/config/settings.yml" do
-  action :create_if_missing
-  source 'settings.yml'
+# Setup list of users that are allowed to enter the site
+template "#{application_path}/config/settings.yml" do
+  source 'settings.yml.erb'
   mode '0644'
   owner user_name
 end
