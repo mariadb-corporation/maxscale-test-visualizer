@@ -1,6 +1,6 @@
 default: &default
   adapter: mysql2
-  database: test_results_db
+  database: <%= node['db']['name'] %>
   username: <%= node['db']['username'] %>
   password: <%= node['db']['password'] %>
   host: <%= node['db']['host'] %>

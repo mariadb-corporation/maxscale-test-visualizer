@@ -119,13 +119,39 @@ rbenv_rehash 'Update shims' do
   user user_name
 end
 
-# Run asset pipeline for rails
+# Run asset pipeline for the Rails application
 rbenv_script 'Publish all assets' do
   rbenv_version ruby_version
   user user_name
   cwd application_path
   environment({ 'RAILS_ENV' => 'production', 'SECRET_KEY_BASE' => rails_secret})
   code 'rails assets:precompile'
+end
+
+# Install database and allow connection to it from the application
+if node['test_env']
+  package 'mariadb-server'
+  package 'mariadb-client'
+
+  query = <<~QUERY
+    create database if not exists #{node['db']['name']}
+    create user if not exists '#{node['db']['username']}'@'localhost' identified by '#{node['db']['password']}'
+    grant all privileges on #{node['db']['name']}.* to '#{node['db']['username']}'@'localhost'
+  QUERY
+  query.each_line do |statement|
+    execute 'Create database and allow connections to it' do
+      command "mysql -e \"#{statement.strip}\""
+    end
+  end
+end
+
+# Run database migrations for the Rails application
+rbenv_script 'Perform database migration' do
+  rbenv_version ruby_version
+  user user_name
+  cwd application_path
+  environment({ 'RAILS_ENV' => 'production', 'SECRET_KEY_BASE' => rails_secret})
+  code 'rails db:migrate'
 end
 
 # Install SystemD service that will run the application

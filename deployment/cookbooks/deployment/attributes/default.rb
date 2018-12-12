@@ -11,6 +11,7 @@ default['nodejs']['install_method'] = 'package'
 # Theese attributes ar likely to be changed for production
 default['db']['username'] = 'test'
 default['db']['password'] = 'test'
+default['db']['name'] = 'test_results_db'
 default['db']['host'] = 'localhost'
 default['db']['port'] = '3306'
 default['rails_secret'] = 'secret'
