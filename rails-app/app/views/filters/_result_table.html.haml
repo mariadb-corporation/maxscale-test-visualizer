@@ -27,7 +27,10 @@
               %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(cur_test_result)}
                 = ion_icon (format_test_result cur_test_result)
               .xx-small-font
-                = "Has core dump" if !cur_test_result.nil? && !cur_test_result['core_dump_path'].nil? && !cur_test_result['core_dump_path'].empty?
+                = 'Has core dump' if !cur_test_result.nil? && !cur_test_result['core_dump_path'].nil? && !cur_test_result['core_dump_path'].empty?
+              - if !cur_test_result.nil? && !cur_test_result['leak_summary'].nil?
+                %button.btn.btn-link.btn-sm.simple-link.p-0.m-0.xx-small-font{'data-content': leak_summary_info(cur_test_result['leak_summary']), "data-toggle" => "popover", "data-placement" => "top", :title => "Leak summary", :type => "button"}
+                  Leak summary
 
 - if !@result_is_empty.nil? && @result_is_empty
   %strong.row.justify-content-center.text-muted

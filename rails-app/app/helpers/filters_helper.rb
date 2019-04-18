@@ -86,6 +86,10 @@ module FiltersHelper
     "<b>Maxscale config:</b> <a href=#{maxscale_cnf_path(id: test_run['id'])}>Config</a> <br>"
   end
 
+  def leak_summary_info(leak_summary)
+    leak_summary.gsub("\n", '<br>')
+  end
+
   def test_result(final_result, test_run, test_name)
     res = final_result.find{ |res| res['id'] == test_run['id'] && res['test'] == test_name}
   end
