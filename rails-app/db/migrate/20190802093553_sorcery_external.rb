@@ -8,5 +8,9 @@ class SorceryExternal < ActiveRecord::Migration[5.2]
     end
 
     add_index :authentications, [:provider, :uid]
+
+    # Delete all users, created by Devise
+    User.delete_all
+    Authentication.delete_all
   end
 end
