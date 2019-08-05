@@ -12,3 +12,8 @@
 
 github_app_id: "c23433a3356"
 github_app_secret: "6ab656f0c5c745437c5f"
+
+development:
+    github_sorcery_callback_url: "http://0.0.0.0:3000/oauth/callback?provider=github"
+production:
+    github_sorcery_callback_url: "http://maxscale-test.mariadb.net/oauth/callback?provider=github"

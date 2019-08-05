@@ -276,7 +276,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user
-    if !user_signed_in? || !current_user.has_access?
+    if !logged_in? || !current_user.has_access?
       @auth_error = 'You do not have access rights'
       return ''
     end

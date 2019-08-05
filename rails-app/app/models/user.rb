@@ -1,17 +1,16 @@
 class User < ApplicationRecord
-  devise :omniauthable, omniauth_providers: [:github]
-
-  def self.from_omniauth(auth)
-    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-      user.provider = auth.provider
-      user.uid = auth.uid
-      user.image = auth.info.image
-      user.name = auth.info.name
-      user.nickname = auth.info.nickname
-    end
-  end
-
   def has_access?
     Settings.authorization.users.include? nickname
+  end
+
+  authenticates_with_sorcery! do |config|
+    config.authentications_class = Authentication
+  end
+
+  has_many :authentications, :dependent => :destroy
+  accepts_nested_attributes_for :authentications
+
+  def has_linked_github?
+    authentications.where(provider: 'github').present?
   end
 end

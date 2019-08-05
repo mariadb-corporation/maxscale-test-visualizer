@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
 
-  devise_for :users, :controllers => { :omniauth_callbacks => 'omniauth_callbacks' }, :path => '/'
-  devise_scope :user do
-    delete 'sign_out', :to => 'devise/sessions#destroy', :as => :destroy_user_session
-  end
+  post 'oauth/callback' => 'oauths#callback'
+  get 'oauth/callback' => 'oauths#callback' # for use with Github
+  get 'oauth/:provider' => 'oauths#oauth', :as => :auth_at_provider
+  delete 'oauth/logout' => 'oauths#destroy', :as => :logout
 
   get 'test_run', to: 'filters#test_results_for_test_runs'
   post 'test_run', to: 'filters#apply_test_run_filters'
