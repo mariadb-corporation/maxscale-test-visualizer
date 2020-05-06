@@ -21,4 +21,4 @@
         .main-page-wrapper.access-error-message= @auth_error
     - else
       .main-page-wrapper
-        = link_to "Sign in with GitHub", auth_at_provider_path(provider: :github), class: 'btn btn-primary'
+        = link_to "Sign in with Google", auth_at_provider_path(provider: :google), class: 'btn btn-primary'
