@@ -11,12 +11,12 @@ module FiltersHelper
   end
 
   def logs_url(job_name, jenkins_id)
-    return '#' if logs_dir.nil? || logs_dir.strip.empty?
+    return '#' if [job_name, jenkins_id].include?(nil)
     "#{LOGS_DIR_URL}/#{job_name}-#{jenkins_id}"
   end
 
   def test_logs_url(job_name, jenkins_id, test_name)
-    return '#' if logs_dir.nil? || logs_dir.strip.empty?
+    return '#' if [job_name, jenkins_id].include?(nil)
     "#{logs_url(job_name, jenkins_id)}/LOGS/#{test_name}"
   end
 
