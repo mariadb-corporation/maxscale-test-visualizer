@@ -10,14 +10,14 @@ module FiltersHelper
     "#{REPOSITORY_URL}/commit/#{commit_id}"
   end
 
-  def logs_url(logs_dir)
+  def logs_url(job_name, jenkins_id)
     return '#' if logs_dir.nil? || logs_dir.strip.empty?
-    "#{LOGS_DIR_URL}/#{logs_dir}"
+    "#{LOGS_DIR_URL}/#{job_name}-#{jenkins_id}"
   end
 
-  def test_logs_url(logs_dir, test_name)
+  def test_logs_url(job_name, jenkins_id, test_name)
     return '#' if logs_dir.nil? || logs_dir.strip.empty?
-    "#{LOGS_DIR_URL}/#{logs_dir}/LOGS/#{test_name}"
+    "#{logs_url(job_name, jenkins_id)}/LOGS/#{test_name}"
   end
 
   def logs_url_for_performance_test_run(jenkins_id)
@@ -59,7 +59,7 @@ module FiltersHelper
     "<b>Job name:</b> #{test_run['job_name']} <br>"\
     "<b>CMake flags:</b> #{test_run['cmake_flags']} <br>"\
     "<b>Maxscale commit:</b> <a href='#{commit_url(test_run['maxscale_commit_id'])}'>#{test_run['maxscale_commit_id']}</a> <br>"\
-    "<b>Logs:</b> <a href='#{logs_url(test_run['logs_dir'])}'>#{test_run['logs_dir']}</a> <br>"\
+    "<b>Logs:</b> <a href='#{logs_url(test_run['job_name'], test_run['jenkins_id'])}'>#{logs_url(test_run['job_name'], test_run['jenkins_id'])}</a> <br>"\
   end
 
   def performance_test_run_info(test_run)

@@ -24,7 +24,7 @@
           - @test_runs.each do |test_run|
             %td.text-center
               - cur_test_result = test_result(@final_result, test_run, test_name)
-              %a{href: test_logs_url(test_run['logs_dir'], test_name), class: icon_color(cur_test_result)}
+              %a{href: test_logs_url(test_run['job_name'], test_run['jenkins_id'], test_name), class: icon_color(cur_test_result)}
                 = ion_icon (format_test_result cur_test_result)
               .xx-small-font
                 = 'Has core dump' if !cur_test_result.nil? && !cur_test_result['core_dump_path'].nil? && !cur_test_result['core_dump_path'].empty?
