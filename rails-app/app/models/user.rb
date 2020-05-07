@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   def has_access?
-    Settings.authorization.users.include? nickname
+    Settings.authorization.users.include?(nickname) ||
+        Settings.authorization.domains.include?(nickname.split('@').last)
   end
 
   authenticates_with_sorcery! do |config|
