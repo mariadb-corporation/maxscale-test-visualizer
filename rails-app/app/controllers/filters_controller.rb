@@ -2,11 +2,11 @@
 
 class FiltersController < ApplicationController
   add_flash_types :error
-  before_action :authenticate_user
+  #before_action :authenticate_user
 
   DEFAULT_TEST_RUN_COUNT = 10
 
-  skip_before_action :verify_authenticity_token
+  #skip_before_action :verify_authenticity_token
   before_action :setup_selected_filters_values,
                 only: [:test_results_for_test_runs,
                        :apply_test_run_filters,

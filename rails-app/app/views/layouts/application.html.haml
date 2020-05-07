@@ -14,11 +14,13 @@
   %body
     = render 'layouts/navbar'
 
-    - if logged_in?
-      - if current_user.has_access?
-        = yield
-      - unless @auth_error.nil?
-        .main-page-wrapper.access-error-message= @auth_error
-    - else
-      .main-page-wrapper
-        = link_to "Sign in with Google", auth_at_provider_path(provider: :google), class: 'btn btn-primary'
+    = yield
+
+    -#- if logged_in?
+    -#  - if current_user.has_access?
+    -#    = yield
+    -#  - unless @auth_error.nil?
+    -#    .main-page-wrapper.access-error-message= @auth_error
+    -#- else
+    -#  .main-page-wrapper
+    -#    = link_to "Sign in with Google", auth_at_provider_path(provider: :google), class: 'btn btn-primary'
