@@ -1,0 +1,5 @@
+# Database URL connection
+DATABASE_URL=mysql2://USER:PASSWORD@HOST/DATABASE
+
+# Rails secret
+SECRET_KEY_BASE=SECRET_HERE

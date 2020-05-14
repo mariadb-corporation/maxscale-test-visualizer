@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  application:
+    build:
+      context: ../
+      dockerfile: docker/application.dockerfile
+      args:
+        BUNDLER_VERSION: 1.17.3
+        NODE_MAJOR: 12
+        RUBY_VERSION: 2.6.6
+        SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+    image: "maxscale-tset-visualizer:0.1.0"
+    env_file: .env
+    command: ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+  nginx:
+    image: "maxscale-tset-visualizer:0.1.0"
+    command: ["nginx"]
+    depends_on:
+      - application
+    ports:
+      - target: 80
+        published: 8001
+        protocol: tcp
