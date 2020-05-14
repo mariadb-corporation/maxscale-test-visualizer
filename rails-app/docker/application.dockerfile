@@ -6,6 +6,7 @@ ARG BUNDLER_VERSION
 ARG NODE_MAJOR
 ARG YARN_VERSION
 ARG SECRET_KEY_BASE
+ARG DATABASE_URL
 
 # Install common dependencies
 RUN apt-get update -qq \
@@ -80,6 +81,6 @@ RUN bundle config --local without 'development test' &&\
 COPY --chown=railsuser:railsuser \
     . ${RAILS_ROOT}
 
-RUN SECRET_KEY_BASE=${SECRET_KEY_BASE} bundle exec rake assets:precompile
+RUN SECRET_KEY_BASE=${SECRET_KEY_BASE} DATABASE_URL=${DATABASE_URL} bundle exec rake assets:precompile
 
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
