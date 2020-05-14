@@ -4,6 +4,7 @@ FROM ruby:${RUBY_VERSION}-slim-buster
 
 ARG BUNDLER_VERSION
 ARG NODE_MAJOR
+ARG YARN_VERSION
 ARG SECRET_KEY_BASE
 
 # Install common dependencies
@@ -25,10 +26,15 @@ RUN apt-get update -qq \
 # Add NodeJS to sources list
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash -
 
+# Add Yarn to the sources list
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && echo 'deb http://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
+
 # Install NodeJS and Yarn package manager
 RUN apt-get update -qq \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
         nodejs \
+        yarn=${YARN_VERSION}-1 \
     && apt-get clean \
     && rm -rf /var/cache/apt/archives/* \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
