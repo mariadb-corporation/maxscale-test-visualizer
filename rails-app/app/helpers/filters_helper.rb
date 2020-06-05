@@ -1,7 +1,6 @@
 module FiltersHelper
-
   REPOSITORY_URL = 'https://github.com/mariadb-corporation/MaxScale'.freeze
-  LOGS_DIR_URL = 'http://max-tst-01.mariadb.com/LOGS'.freeze
+  LOGS_DIR_URL = 'https://mdbe-ci-repo.mariadb.net/bb-logs/Maxscale'.freeze
 
   def commit_url(commit_id)
     if commit_id.nil? || commit_id.strip.empty? || commit_id.length != 40
@@ -12,12 +11,12 @@ module FiltersHelper
 
   def logs_url(job_name, jenkins_id)
     return '#' if [job_name, jenkins_id].include?(nil)
-    "#{LOGS_DIR_URL}/#{job_name}-#{jenkins_id}"
+    "#{LOGS_DIR_URL}/#{job_name}-#{jenkins_id}/"
   end
 
   def test_logs_url(job_name, jenkins_id, test_name)
     return '#' if [job_name, jenkins_id].include?(nil)
-    "#{logs_url(job_name, jenkins_id)}/LOGS/#{test_name}"
+    "#{logs_url(job_name, jenkins_id)}LOGS/#{test_name}/"
   end
 
   def logs_url_for_performance_test_run(jenkins_id)
