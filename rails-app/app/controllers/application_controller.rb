@@ -137,7 +137,7 @@ class ApplicationController < ActionController::Base
       condition = 'WHERE ' + condition
     end
 
-    "SELECT * FROM test_run #{condition}"
+    "SELECT * FROM target_builds #{condition}"
   end
 
   # SQL-query for the table page with filtered test runs and tests
@@ -147,11 +147,11 @@ class ApplicationController < ActionController::Base
     tests_filter = filter_tests_to_sql('results.test', selected_filters_values[:tests_names])
 
     filter_test_run_str =
-        "SELECT results.test, results.result, results.core_dump_path, results.leak_summary, filter_test_run.* "\
+        "SELECT results.id as test_run_id, results.test, results.target_build_id, results.result, results.core_dump_path, results.leak_summary, filter_test_run.* "\
       "FROM results "\
       "INNER JOIN "\
       "  (#{test_run_filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}) "\
-      "  as filter_test_run using(id) "\
+      "  as filter_test_run ON results.target_build_id = filter_test_run.id "\
       "#{tests_filter} "
 
     if !selected_filters_values[:hide_passed_tests].nil? && selected_filters_values[:hide_passed_tests] == 'true'
@@ -181,10 +181,15 @@ class ApplicationController < ActionController::Base
     res
   end
 
-  # SQL-query for the test runs that are located on the table page
-  def test_runs_on_page_sql(selected_filters_values, test_runs_count, columns_count, page_num)
-    limit, offset = calc_limit_and_offset(test_runs_count, columns_count, page_num)
-    "#{test_run_filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}"
+  # SQL-query for the target builds that are located on the table page
+  def target_builds_on_page_sql(selected_filters_values, total, per_page, page)
+    limit, offset = calc_limit_and_offset(total, per_page, page)
+    <<-SQL
+      #{test_run_filters_to_sql(selected_filters_values)}
+      ORDER BY start_time
+      LIMIT #{limit}
+      OFFSET #{offset}
+    SQL
   end
 
   # Limit and offset for the sql-query for the test_runs that are located on the table page

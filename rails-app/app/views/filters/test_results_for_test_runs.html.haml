@@ -1,3 +1,20 @@
+:javascript
+  function onTargetClick(button, dataId) {
+    $("#targetInfoModal .modal-body").replaceWith('<div class="modal-body">'+$(dataId).html()+'</div>');
+    $('#targetInfoModal').modal('show');
+  }
+
+/ Modal
+#targetInfoModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "exampleModalLongTitle", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %h5#exampleModalLongTitle.modal-title Target build
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+      .modal-body
+
+
 .container-fluid
   .row.justify-content-center
     .col-sm-12.col-md-10.col-8
@@ -110,6 +127,3 @@
         .col
           #main-table-container
             = render 'filters/result_table'
-
-
-

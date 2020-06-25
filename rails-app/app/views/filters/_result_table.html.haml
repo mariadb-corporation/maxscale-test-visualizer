@@ -5,32 +5,35 @@
     %thead
       %tr.sticky-row
         %th.sticky-cell.v-align-middle{:scope => "col"} Test Name \ Tests Run
-        - @test_runs.each do |test_run|
+        - @target_builds.each do |target_build|
           %th.text-center.v-align-top{:scope => "col"}
-            %button.btn.btn-link.simple-link{"data-content" => test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
-              = test_run['id']
+            %div{ id: "target_build_info_#{target_build['id']}", style: 'display: none' }
+              = render :partial => "test_run_info", locals: { target_build: target_build }
+            %button.btn.btn-link.simple-link.target-build-button{"data-div-id" => "#target_build_info_#{target_build['id']}", :type => "button", onclick: "onTargetClick('#button_#{target_build['id']}', '#target_build_info_#{target_build['id']}')", id: "button_#{target_build['id']}"}
+              = target_build['id']
             .xx-small-font
-              = test_run['maxscale_source']
+              = target_build['maxscale_source']
               %br
-              = test_run['target']
+              = target_build['target']
               %br
-              = test_run['start_time'].to_s.delete 'UTC'
+              = target_build['start_time'].to_s.delete 'UTC'
     %tbody
       - @tests_names.each do |test_name|
         %tr
           %th.sticky-cell{:scope => "row"}
             = test_name
 
-          - @test_runs.each do |test_run|
+          - @target_builds.each do |target_build|
             %td.text-center
-              - cur_test_result = test_result(@final_result, test_run, test_name)
-              %a{href: test_logs_url(test_run['job_name'], test_run['jenkins_id'], test_name), class: icon_color(cur_test_result)}
-                = ion_icon (format_test_result cur_test_result)
-              .xx-small-font
-                = 'Has core dump' if !cur_test_result.nil? && !cur_test_result['core_dump_path'].nil? && !cur_test_result['core_dump_path'].empty?
-              - if !cur_test_result.nil? && !cur_test_result['leak_summary'].nil?
-                %button.btn.btn-link.btn-sm.simple-link.p-0.m-0.xx-small-font{'data-content': leak_summary_info(cur_test_result['leak_summary']), "data-toggle" => "popover", "data-placement" => "top", :title => "Leak summary", :type => "button"}
-                  Leak summary
+              - cur_test_results = test_result(@final_result, target_build, test_name)
+              - cur_test_results.each do |cur_test_result|
+                %a{href: test_logs_url(test_run_by_id(cur_test_result['test_run_id'])['job_name'], test_run_by_id(cur_test_result['test_run_id'])['jenkins_id'], test_name), class: icon_color(cur_test_result)}
+                  = ion_icon (format_test_result cur_test_result)
+                .xx-small-font
+                  = 'Has core dump' if !cur_test_result.nil? && !cur_test_result['core_dump_path'].nil? && !cur_test_result['core_dump_path'].empty?
+                - if !cur_test_result.nil? && !cur_test_result['leak_summary'].nil?
+                  %button.btn.btn-link.btn-sm.simple-link.p-0.m-0.xx-small-font{'data-content': leak_summary_info(cur_test_result['leak_summary']), "data-toggle" => "popover", "data-placement" => "top", :title => "Leak summary", :type => "button"}
+                    Leak summary
 
 - if !@result_is_empty.nil? && @result_is_empty
   %strong.row.justify-content-center.text-muted

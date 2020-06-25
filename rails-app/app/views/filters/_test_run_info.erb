@@ -1,0 +1,16 @@
+<b>id:</b> <%= target_build['id'] %> <br>
+<b>Start time:</b> <%= target_build['start_time'] %> <br>
+<b>Target:</b> <%= target_build['target'] %> <br>
+<b>Box:</b> <%= target_build['box'] %> <br>
+<b>Product:</b> <%= target_build['product'] %> <br>
+<b>MariaDB version:</b> <%= target_build['mariadb_version'] %> <br>
+<b>Maxscale source:</b> <%= target_build['maxscale_source'] %> <br>
+<b>CMake flags:</b> <%= target_build['cmake_flags'] %> <br>
+<b>Maxscale commit:</b> <a href='<%= commit_url(target_build['maxscale_commit_id']) %>'><%= target_build['maxscale_commit_id'] %></a> <br>
+<b>Logs:</b><br>
+<% test_runs_by_target_build(target_build['id']).each do |test_run| %>
+  <a href='<%= logs_url(test_run['job_name'], test_run['jenkins_id']) %>'>
+    TestRun <b>#<%= test_run['id'] %></b> logs
+  </a>
+  <br>
+<% end %>

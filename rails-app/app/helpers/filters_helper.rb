@@ -46,21 +46,6 @@ module FiltersHelper
     !filter_selects.nil? && filter_selects.include?(option)
   end
 
-  def test_run_info(test_run)
-    "<b>id:</b> #{test_run['id']} <br>"\
-    "<b>Jenkins id:</b> #{test_run['jenkins_id']} <br>"\
-    "<b>Start time:</b> #{test_run['start_time']} <br>"\
-    "<b>Target:</b> #{test_run['target']} <br>"\
-    "<b>Box:</b> #{test_run['box']} <br>"\
-    "<b>Product:</b> #{test_run['product']} <br>"\
-    "<b>MariaDB version:</b> #{test_run['mariadb_version']} <br>"\
-    "<b>Maxscale source:</b> #{test_run['maxscale_source']} <br>"\
-    "<b>Job name:</b> #{test_run['job_name']} <br>"\
-    "<b>CMake flags:</b> #{test_run['cmake_flags']} <br>"\
-    "<b>Maxscale commit:</b> <a href='#{commit_url(test_run['maxscale_commit_id'])}'>#{test_run['maxscale_commit_id']}</a> <br>"\
-    "<b>Logs:</b> <a href='#{logs_url(test_run['job_name'], test_run['jenkins_id'])}'>#{logs_url(test_run['job_name'], test_run['jenkins_id'])}</a> <br>"\
-  end
-
   def performance_test_run_info(test_run)
     "<b>id:</b> #{test_run['id']} <br>"\
     "<b>Jenkins id:</b> #{test_run['jenkins_id']} <br>"\
@@ -89,7 +74,15 @@ module FiltersHelper
     leak_summary.gsub("\n", '<br>')
   end
 
-  def test_result(final_result, test_run, test_name)
-    res = final_result.find{ |res| res['id'] == test_run['id'] && res['test'] == test_name}
+  def test_result(final_result, target_build, test_name)
+    final_result.select { |res| res['target_build_id'] == target_build['id'] && res['test'] == test_name}
+  end
+
+  def test_runs_by_target_build(target_build_id)
+    @test_runs.select { |test_run| test_run[:target_build_id] == target_build_id }
+  end
+
+  def test_run_by_id(id)
+    @test_runs.find { |test_run| test_run[:id] == id }
   end
 end
