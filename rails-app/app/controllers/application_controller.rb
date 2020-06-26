@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
+  skip_before_action :verify_authenticity_token, if: :json_request?
 
   private
 
@@ -285,5 +286,11 @@ class ApplicationController < ActionController::Base
       @auth_error = 'You do not have access rights'
       return ''
     end
+  end
+
+  protected
+
+  def json_request?
+    request.format.json?
   end
 end
