@@ -107,7 +107,7 @@
                         %label{:for => "target_field_dropdown"} Value
                       .col
                         %select#target_field_dropdown.form-control.form-control{:name => "target_field_dropdown"}
-                          - @tests_names.each do |test_name|
+                          - @tests_cases.each do |test_name|
                             %option{value: test_name, selected: option_selected?(test_name, @selected_filters_values[:target_field])}
                               = test_name
 

@@ -17,7 +17,7 @@
 
           - @x_axis_values.each_with_index do |x_value, x_index|
             %td.text-center
-              - cell = @final_result.select{|row| row[@x_axis_name] == x_value && row[@y_axis_name] == y_value}
+              - cell = @test_results.select{|row| row[@x_axis_name] == x_value && row[@y_axis_name] == y_value}
               - if !cell.nil? && !cell.empty?
                 - cell.sort_by!{|x| x[:start_time]}
                 - last_value = cell.pop

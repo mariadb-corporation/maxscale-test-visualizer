@@ -1,11 +1,11 @@
 .sticky-table.sticky-headers.sticky-ltr-cells
   .loader-container
     = render 'layouts/loader_indicator'
-  %table#main-table.table-bordered.table-hover.table.table-sm{pagination: "true", 'rows-count' => @tests_names.size}
+  %table#main-table.table-bordered.table-hover.table.table-sm{pagination: "true", 'rows-count' => @tests_cases.size}
     %thead
       %tr.sticky-row
         %th.sticky-cell.v-align-middle{:scope => "col"} Test Name \ Tests Run
-        - @final_result.each do |test_run|
+        - @test_results.each do |test_run|
           %th.text-center.v-align-top{:scope => "col"}
             %button.btn.btn-link.simple-link{"data-content" => performance_test_run_info(test_run), "data-toggle" => "popover", "data-placement" => "top", :title => "Info", :type => "button"}
               = test_run['id']
@@ -14,12 +14,12 @@
               %br
               = test_run['start_time'].to_s.delete 'UTC'
     %tbody
-      - @tests_names.each do |test_name|
+      - @tests_cases.each do |test_name|
         %tr
           %th.sticky-cell{:scope => "row"}
             = test_name
 
-          - @final_result.each do |test_run|
+          - @test_results.each do |test_run|
             %td.text-center
               = test_run[test_name]
 

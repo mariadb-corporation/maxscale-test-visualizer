@@ -144,42 +144,37 @@ class ApplicationController < ActionController::Base
   # SQL-query for the table page with filtered test runs and tests
   def test_run_table_page_to_sql(selected_filters_values, test_runs_count, columns_count, page_num)
     limit, offset = calc_limit_and_offset(test_runs_count, columns_count, page_num)
+    tests_filter = filter_tests_to_sql('results.test_case_id', selected_filters_values[:test_cases])
+    hide_passed_tests_filter = if !selected_filters_values[:hide_passed_tests].nil? &&
+                                  selected_filters_values[:hide_passed_tests] == 'true'
+                                 'WHERE (main_table.total_res > 0)'
+                               else
+                                 ''
+                               end
 
-    tests_filter = filter_tests_to_sql('results.test', selected_filters_values[:tests_names])
+    filtered_test_results = <<-SQL
+      SELECT
+        results.id as test_run_id, results.test_case_id, results.target_build_id, results.result,
+        results.core_dump_path, results.leak_summary
+      FROM results
+      INNER JOIN (
+        #{test_run_filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}
+      ) as filtered_target_builds ON results.target_build_id = filtered_target_builds.id
+      #{tests_filter}
+    SQL
 
-    filter_test_run_str =
-        "SELECT results.id as test_run_id, results.test, results.target_build_id, results.result, results.core_dump_path, results.leak_summary, filter_test_run.* "\
-      "FROM results "\
-      "INNER JOIN "\
-      "  (#{test_run_filters_to_sql(selected_filters_values)} ORDER BY start_time LIMIT #{limit} OFFSET #{offset}) "\
-      "  as filter_test_run ON results.target_build_id = filter_test_run.id "\
-      "#{tests_filter} "
-
-    if !selected_filters_values[:hide_passed_tests].nil? && selected_filters_values[:hide_passed_tests] == 'true'
-      hide_passed_tests_filter = ' WHERE (main_table.total_res > 0)'
-    else
-      hide_passed_tests_filter = ''
-    end
-
-    res =
-        "SELECT * FROM "\
-      "  (SELECT * FROM "\
-      "    ( "\
-      "      #{filter_test_run_str} "\
-      "    ) as main_table "\
-      "  INNER JOIN "\
-      "    ( "\
-      "      SELECT "\
-      "        main_table_2.test as 'test', SUM(result) as total_res "\
-      "      FROM "\
-      "        ( "\
-      "          #{filter_test_run_str} "\
-      "        ) as main_table_2 "\
-      "      GROUP BY main_table_2.test "\
-      "    ) as total_res_table using(test)) as main_table "\
-      "#{hide_passed_tests_filter} ORDER BY test;"
-
-    res
+    <<-SQL
+      SELECT * FROM (
+        SELECT * FROM
+        (#{filtered_test_results}) as main_table
+        INNER JOIN (
+         SELECT main_table_2.test_case_id as case_id, SUM(result) as total_res
+         FROM (#{filtered_test_results}) as main_table_2
+         GROUP BY main_table_2.test_case_id
+        ) as total_res_table ON total_res_table.case_id = main_table.test_case_id
+      ) as main_table
+      #{hide_passed_tests_filter};
+    SQL
   end
 
   # SQL-query for the target builds that are located on the table page

@@ -1,0 +1,194 @@
+<script>
+
+    function onTargetClick(button, dataId) {
+        $("#targetInfoModal .modal-body").replaceWith('<div class="modal-body">'+$(dataId).html()+'</div>');
+        $('#targetInfoModal').modal('show');
+    }
+
+
+</script>
+<!-- Modal
+-->
+<div aria-hidden="true" aria-labelledby="exampleModalLongTitle" class="modal fade" id="targetInfoModal" role="dialog" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Target build</h5>
+        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+          <span aria-hidden="true">x</span>
+        </button>
+      </div>
+      <div class="modal-body"></div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-10 col-8">
+      <div class="row">
+        <div class="card width-100">
+          <div class="card-body">
+            <form action="<%= test_run_path %>" class="width-100" data-remote="<%= true %>" id="filtersForm" method="post">
+              <div class="row">
+                <div class="col">
+                  <div class="form-group row">
+                    <div class="col-3">
+                      <label for="mariadb_version_select">MariaDB version</label>
+                    </div>
+                    <div class="col">
+                      <select class="form-control" id="mariadb_version_select" multiple="multiple" name="mariadb_version[]">
+                        <option <%= selected_attr(option_selected?("All", @selected_filters_values[:mariadb_version])) %> value="All">All</option>
+                        <% @mariadb_version_options.each do |mariadb_version| %>
+                          <option <%= selected_attr(option_selected?(mariadb_version.mariadb_version, @selected_filters_values[:mariadb_version])) %> value="<%= mariadb_version.mariadb_version %>">
+                            <%= mariadb_version.mariadb_version %>
+                          </option>
+                        <% end %>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-3">
+                      <label for="maxscale_source_select">Maxscale source</label>
+                    </div>
+                    <div class="col">
+                      <select class="form-control" id="maxscale_source_select" multiple="multiple" name="maxscale_source[]">
+                        <option <%= selected_attr(option_selected?("All", @selected_filters_values[:maxscale_source])) %> value="All">All</option>
+                        <% @maxscale_source_options.each do |maxscale_source| %>
+                          <option <%= selected_attr(option_selected?(maxscale_source.maxscale_source, @selected_filters_values[:maxscale_source])) %> value="<%= maxscale_source.maxscale_source %>">
+                            <%= maxscale_source.maxscale_source %>
+                          </option>
+                        <% end %>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-3">
+                      <label for="box_select">Box</label>
+                    </div>
+                    <div class="col">
+                      <select class="form-control" id="box_select" multiple="multiple" name="box[]">
+                        <option <%= selected_attr(option_selected?("All", @selected_filters_values[:box])) %> value="All">All</option>
+                        <% @box_options.each do |box| %>
+                          <option <%= selected_attr(option_selected?(box.box, @selected_filters_values[:box])) %> value="<%= box.box %>">
+                            <%= box.box %>
+                          </option>
+                        <% end %>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-3">
+                      <label for="id_input">Test run (id)</label>
+                    </div>
+                    <div class="col">
+                      <input class="form-control" id="id_input" name="id" placeholder="Example: 5-6, 10-12, 15" type="text" value="<%= @selected_filters_values[:id] %>"></input>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-3">
+                      <label for="time_interval_dropdown">Time interval</label>
+                    </div>
+                    <div class="col">
+                      <select class="form-control form-control" id="time_interval_dropdown" name="time_interval_dropdown">
+                        <option value="1">1 day</option>
+                        <option value="2">2 days</option>
+                        <option value="5">5 days</option>
+                        <option selected="<%= true %>" value="<%= -1 %>">All time</option>
+                        <option value="<%= -2 %>">Set interval</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row" id="time_interval_form">
+                    <div class="col-3"></div>
+                    <div class="col">
+                      <input class="form-control" id="time_interval_start" name="time_interval_start" type="date" value="<%= @selected_filters_values[:time_interval_start] %>"></input>
+                    </div>
+                    <div class="col">
+                      <input class="form-control" id="time_interval_finish" name="time_interval_finish" type="date" value="<%= @selected_filters_values[:time_interval_finish] %>"></input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div id="flashesContainer"></div>
+                  <div class="form-group">
+                    <div class="input-group-prepend align-items-start justify-content-between">
+                      <div class="form-check">
+                        <input <%= checked_attr(!@selected_filters_values[:use_sql_query].nil?) %> class="form-check-input" id="use_sql_query_check" name="use_sql_query" type="checkbox" value="true"></input>
+                        <label class="form-check-label" for="use_sql_query_check">Custom Filter</label>
+                      </div>
+                      <button class="btn btn-sm btn-link" data-target="#sqlQueryHelpModal" data-toggle="modal" type="button">
+                        <%= ion_icon('help-circled') %>
+                      </button>
+                    </div>
+                    <textarea class="form-control" id="sql_query_textarea" name="sql_query" rows="4" type="text">
+                      <%= @selected_filters_values[:sql_query] %>
+                    </textarea>
+                  </div>
+                </div>
+              </div>
+              <!-- row with hidden fields (for pagination)
+              -->
+              <div class="row">
+                <input class="form-control" id="pageNum" name="page_num" type="hidden" value="<%= @selected_filters_values[:page_num] %>"></input>
+                <input class="form-control" id="tableColumnsCount" name="table_columns_count" type="hidden" value="<%= @selected_filters_values[:table_columns_count] %>"></input>
+                <input class="form-control" id="tablePagesCount" name="table_pages_count" type="hidden" value="<%= @selected_filters_values[:table_pages_count] %>"></input>
+                <input class="form-control" id="filterPage" name="filter_page" type="hidden" value="<%= @filter_page %>"></input>
+              </div>
+              <div class="row align-items-center">
+                <div class="col">
+                  <div class="form-group mb-0">
+                    <button class="btn btn-outline-dark btn-block" data-target="#selectTestsModal" data-toggle="modal" id="selectTestsButton" type="button">Select tests</button>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-check">
+                    <input <%= checked_attr(!@selected_filters_values[:hide_passed_tests].nil?) %> class="form-check-input" id="hide_passed_tests_check" name="hide_passed_tests" type="checkbox" value="true"></input>
+                    <label class="form-check-label" for="hide_passed_tests_check">Hide the passed tests</label>
+                  </div>
+                </div>
+                <div class="col">
+                  <button class="btn btn-primary btn-block" id="submitButton" type="submit">Submit</button>
+                </div>
+              </div>
+              <%= render 'select_tests_modal' %>
+              <%= render 'sql_query_help_modal' %>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-auto">
+          <%= render 'table_pagination' %>
+        </div>
+        <div class="col-auto">
+          <div class="form-group row">
+            <label class="col-form-label" for="itemsPerPageCountSelect">Test runs per page</label>
+            <div class="col">
+              <select class="form-control form-control" data-items-per-page-count="20" id="itemsPerPageCountSelect">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="form-group row">
+            <label class="col-form-label" id="totalCount">
+              <%= '(Total count: ' + @filtered_test_runs_count.to_s + ')' %>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div id="main-table-container">
+            <%= render 'filters/result_table' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

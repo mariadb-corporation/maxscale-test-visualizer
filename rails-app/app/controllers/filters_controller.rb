@@ -131,10 +131,10 @@ class FiltersController < ApplicationController
     @params = params
 
     # Values for the form elements
-    @mariadb_version_options = TestRun.mariadb_version_values
-    @maxscale_source_options = TestRun.maxscale_source_values
-    @box_options = TestRun.box_values
-    @test_options = Result.test_names
+    @mariadb_version_options = TargetBuild.mariadb_version_values
+    @maxscale_source_options = TargetBuild.maxscale_source_values
+    @box_options = TargetBuild.box_values
+    @test_options = TestCase.all.order(:name)
     @filter_page = 'TestRun'
 
     make_test_run_query
@@ -158,7 +158,7 @@ class FiltersController < ApplicationController
         @selected_filters_values[:page_num] = @selected_filters_values[:table_pages_count]
       end
 
-      @final_result = db.exec_query(test_run_table_page_to_sql(@selected_filters_values,
+      @test_results = db.exec_query(test_run_table_page_to_sql(@selected_filters_values,
                                                                @filtered_test_runs_count,
                                                                @selected_filters_values[:table_columns_count],
                                                                @selected_filters_values[:page_num]))
@@ -167,12 +167,12 @@ class FiltersController < ApplicationController
                                                                @selected_filters_values[:table_columns_count],
                                                                @selected_filters_values[:page_num]))
       @test_runs = TestRun.where(target_build_id: @target_builds.map { |t| t['id'] })
-      @tests_names = @final_result.collect { |row| row['test'] }.uniq
+      @tests_cases = TestCase.where(id: @test_results.map { |test_result| test_result['test_case_id'] }).order(:name)
     else
       @result_is_empty = true
-      @tests_names = []
+      @tests_cases = []
       @target_builds = []
-      @final_result = []
+      @test_results = []
       @test_runs = []
     end
   end
@@ -213,7 +213,7 @@ class FiltersController < ApplicationController
       query_result = db.execute(performance_test_run_table_page_to_sql(@selected_filters_values, filtered_performance_test_runs.count, @selected_filters_values[:table_columns_count], @selected_filters_values[:page_num]))
       # test_runs_on_page = db.execute(test_runs_on_page_sql(@selected_filters_values, filtered_test_runs.count, @selected_filters_values[:table_columns_count], @selected_filters_values[:page_num]))
 
-      @final_result = []
+      @test_results = []
       query_result.each(:as => :hash) do |row|
         begin
           row['QPS_read'] = (row['OLTP_test_statistics_queries_performed_read'] / row['General_statistics_total_time']).round(2)
@@ -222,11 +222,11 @@ class FiltersController < ApplicationController
           row['QPS_total'] = (row['OLTP_test_statistics_queries_performed_total'] / row['General_statistics_total_time']).round(2)
         rescue Exception => e
         end
-        @final_result << row
+        @test_results << row
       end
 
       if @mode == 'default'
-        @tests_names = ['OLTP_test_statistics_ignored_errors',
+        @tests_cases = ['OLTP_test_statistics_ignored_errors',
                         'General_statistics_response_time_approx__95_percentile',
                         'General_statistics_response_time_avg',
                         'General_statistics_response_time_max',
@@ -244,15 +244,15 @@ class FiltersController < ApplicationController
                         'Threads_fairness_execution_time_avg',
                         'Threads_fairness_execution_time_stddev']
       elsif @mode == 'qps'
-        @tests_names = ['QPS_read',
+        @tests_cases = ['QPS_read',
                         'QPS_write',
                         'QPS_other',
                         'QPS_total']
       end
     else
       @result_is_empty = true
-      @tests_names = []
-      @final_result = []
+      @tests_cases = []
+      @test_results = []
     end
   end
 
@@ -300,7 +300,7 @@ class FiltersController < ApplicationController
     end
 
     if !@query_error && @filtered_performance_test_runs_count > 0
-      @final_result = []
+      @test_results = []
       filtered_performance_test_runs.each(:as => :hash) do |row|
         begin
           row['QPS_read'] = (row['OLTP_test_statistics_queries_performed_read'] / row['General_statistics_total_time']).round(2)
@@ -309,23 +309,23 @@ class FiltersController < ApplicationController
           row['QPS_total'] = (row['OLTP_test_statistics_queries_performed_total'] / row['General_statistics_total_time']).round(2)
         rescue Exception => e
         end
-        @final_result << row
+        @test_results << row
       end
     else
       @result_is_empty = true
-      @tests_names = []
-      @final_result = []
+      @tests_cases = []
+      @test_results = []
     end
 
-    @tests_names = ['QPS_read',
+    @tests_cases = ['QPS_read',
                     'QPS_write',
                     'QPS_other',
                     'QPS_total']
     @x_axis_name = @selected_filters_values[:x_axis_name] || 'maxscale_source'
     @y_axis_name = @selected_filters_values[:y_axis_name] || 'maxscale_threads'
-    @x_axis_values = get_field_unique_values_from_array(@final_result, @x_axis_name)
+    @x_axis_values = get_field_unique_values_from_array(@test_results, @x_axis_name)
     @x_axis_values.sort! { |a,b| a && b ? a <=> b : a ? -1 : 1 } unless @x_axis_values.nil?
-    @y_axis_values = get_field_unique_values_from_array(@final_result, @y_axis_name)
+    @y_axis_values = get_field_unique_values_from_array(@test_results, @y_axis_name)
     @y_axis_values.sort! { |a,b| a && b ? a <=> b : a ? -1 : 1 } unless @y_axis_values.nil?
     @target_field = @selected_filters_values[:target_field] || 'QPS_read'
   end
@@ -342,7 +342,7 @@ class FiltersController < ApplicationController
         maxscale_source: params['maxscale_source'],
         box: params['box'],
         id: params['id'],
-        tests_names: params['tests_names'],
+        test_cases: params['test_cases'],
         hide_passed_tests: params['hide_passed_tests'],
         use_sql_query: params['use_sql_query'],
         sql_query: params['sql_query'],
@@ -366,7 +366,7 @@ class FiltersController < ApplicationController
     end
 
     if @selected_filters_values[:table_columns_count].zero?
-      @selected_filters_values[:table_columns_count] = 20
+      @selected_filters_values[:table_columns_count] = 10
     end
   end
 end

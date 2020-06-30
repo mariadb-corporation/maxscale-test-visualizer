@@ -1,0 +1,60 @@
+<div class="sticky-table sticky-headers sticky-ltr-cells">
+  <div class="loader-container">
+    <%= render 'layouts/loader_indicator' %>
+  </div>
+  <table class="table-bordered table-hover table table-sm" id="main-table" pagination="true" rows-count="<%= @tests_cases.size %>">
+    <thead>
+    <tr class="sticky-row">
+      <th class="sticky-cell v-align-middle" scope="col">Test Name \ Tests Run</th>
+      <% @target_builds.each do |target_build| %>
+        <th class="text-center v-align-top" scope="col">
+          <div id="target_build_info_<%= target_build['id'] %>" style="display: none">
+            <%= render :partial => "test_run_info", locals: { target_build: target_build } %>
+          </div>
+          <button class="btn btn-link simple-link target-build-button" data-div-id="#target_build_info_<%= target_build['id'] %>" id="button_<%= target_build['id'] %>" onclick="onTargetClick('#button_<%= target_build['id'] %>', '#target_build_info_<%= target_build['id'] %>')" type="button">
+            <%= target_build['id'] %>
+          </button>
+          <div class="xx-small-font">
+            <%= target_build['maxscale_source'] %>
+            <br/>
+            <%= target_build['target'] %>
+            <br/>
+            <%= target_build['start_time'].to_s.delete 'UTC' %>
+          </div>
+        </th>
+      <% end %>
+    </tr>
+    </thead>
+    <tbody>
+    <% @tests_cases.each do |test_case| %>
+      <tr>
+        <th class="sticky-cell" scope="row">
+          <%= test_case['name'] %>
+        </th>
+        <% @target_builds.each do |target_build| %>
+          <td class="text-center">
+            <% test_results_by_target_build_and_test_case(@test_results, target_build, test_case).each do |cur_test_result| %>
+              <a class="<%= icon_color(cur_test_result) %>" href="<%= test_logs_url(test_run_by_id(cur_test_result['test_run_id']), test_case) %>" target="_blank">
+                <%= ion_icon (format_test_result cur_test_result) %>
+              </a>
+              <div class="xx-small-font">
+                <%= 'Has core dump' if !cur_test_result.nil? && !cur_test_result['core_dump_path'].nil? && !cur_test_result['core_dump_path'].empty? %>
+              </div>
+              <% if !cur_test_result.nil? && !cur_test_result['leak_summary'].nil? %>
+                <button class="btn btn-link btn-sm simple-link p-0 m-0 xx-small-font" data-content="<%= leak_summary_info(cur_test_result['leak_summary']) %>" data-placement="top" data-toggle="popover" title="Leak summary" type="button">
+                  Leak summary
+                </button>
+              <% end %>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<% if !@result_is_empty.nil? && @result_is_empty %>
+  <strong class="row justify-content-center text-muted">
+    No results found
+  </strong>
+<% end %>

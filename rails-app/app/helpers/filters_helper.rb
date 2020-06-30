@@ -14,9 +14,13 @@ module FiltersHelper
     "#{LOGS_DIR_URL}/#{job_name}-#{jenkins_id}/"
   end
 
-  def test_logs_url(job_name, jenkins_id, test_name)
+  def build_test_logs_url(job_name, jenkins_id, test_name)
     return '#' if [job_name, jenkins_id].include?(nil)
     "#{logs_url(job_name, jenkins_id)}LOGS/#{test_name}/"
+  end
+
+  def test_logs_url(test_run, test_case)
+    build_test_logs_url(test_run['job_name'], test_run['jenkins_id'], test_case['name'])
   end
 
   def logs_url_for_performance_test_run(jenkins_id)
@@ -74,8 +78,10 @@ module FiltersHelper
     leak_summary.gsub("\n", '<br>')
   end
 
-  def test_result(final_result, target_build, test_name)
-    final_result.select { |res| res['target_build_id'] == target_build['id'] && res['test'] == test_name}
+  def test_results_by_target_build_and_test_case(final_result, target_build, test_case)
+    final_result.select do |res|
+      res['target_build_id'] == target_build['id'] && res['test_case_id'] == test_case['id']
+    end
   end
 
   def test_runs_by_target_build(target_build_id)
