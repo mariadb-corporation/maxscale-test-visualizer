@@ -46,6 +46,11 @@ function refreshPageData() {
 
 
 function formAjaxRequest() {
+    const formValue = $("#filtersForm").serializeArray().filter(item => !item.name.match(/test_cases\[.+\]/));
+    formValue.push({name: 'do_search', value: ''});
+    history.pushState({
+        id: 'visualizer'
+    }, 'Home', location.protocol + '//' + location.host + location.pathname + '?' + $.param(formValue));
     $("#filtersForm").ajaxSubmit({
         url: $("#filtersForm")[0].action,
         type: 'POST',

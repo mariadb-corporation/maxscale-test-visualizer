@@ -21,6 +21,9 @@ class FiltersController < ApplicationController
   def test_results_for_test_runs
     @selected_filters_values[:hide_passed_tests] = 'true'
     test_run_main_filter
+    if params[:do_search] == 'true'
+      make_test_run_query
+    end
   end
 
   def apply_test_run_filters
@@ -342,6 +345,7 @@ class FiltersController < ApplicationController
         maxscale_source: params['maxscale_source'],
         box: params['box'],
         id: params['id'],
+        run_test_id: params['run_test_id'],
         test_cases: params['test_cases'],
         hide_passed_tests: params['hide_passed_tests'],
         use_sql_query: params['use_sql_query'],

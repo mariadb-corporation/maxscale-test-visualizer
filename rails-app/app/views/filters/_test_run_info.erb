@@ -10,7 +10,7 @@
 <b>Logs:</b><br>
 <% test_runs_by_target_build(target_build['id']).each do |test_run| %>
   <a href='<%= logs_url(test_run['job_name'], test_run['jenkins_id']) %>'>
-    TestRun <b>#<%= test_run['id'] %></b> logs
+    TestRun <b>#<%= test_run['id'] %></b> logs (Buildbot build#<%= test_run['jenkins_id'] %>)
   </a>
   <br>
 <% end %>

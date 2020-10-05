@@ -89,6 +89,9 @@ class ApplicationController < ActionController::Base
     id = ranges_string_to_sql('id', selected_filters_values[:id])
     result << id unless id.empty?
 
+    jenkins_id = ranges_string_to_sql('test_run.jenkins_id', selected_filters_values[:run_test_id])
+    result << jenkins_id unless jenkins_id.empty?
+
     dbms = field_with_version_to_sql(selected_filters_values[:dbms], 'product', 'mariadb_version', 'All')
     result << "(#{dbms})" unless dbms.empty?
 
@@ -138,7 +141,13 @@ class ApplicationController < ActionController::Base
       condition = 'WHERE ' + condition
     end
 
-    "SELECT * FROM target_builds #{condition}"
+    %{
+    SELECT * FROM target_builds
+    WHERE id IN (
+      SELECT target_builds.id
+      FROM target_builds
+      LEFT JOIN test_run ON test_run.target_build_id = target_builds.id #{condition}
+    )}
   end
 
   # SQL-query for the table page with filtered test runs and tests
