@@ -86,8 +86,7 @@ class ApplicationController < ActionController::Base
     box = filter_field_to_sql('target_builds.box', selected_filters_values, 'All')
     result << box unless box.empty?
 
-    id = ranges_string_to_sql('target_builds.id', selected_filters_values[:id])
-    result << id unless id.empty?
+    result << "target_builds.run_id = '#{selected_filters_values[:run_id]}'" unless selected_filters_values[:run_id].blank?
 
     jenkins_id = ranges_string_to_sql('test_run.jenkins_id', selected_filters_values[:run_test_id])
     result << jenkins_id unless jenkins_id.empty?

@@ -344,7 +344,7 @@ class FiltersController < ApplicationController
         mariadb_version: params['mariadb_version'],
         maxscale_source: params['maxscale_source'],
         box: params['box'],
-        id: params['id'],
+        run_id: params['run_id'],
         run_test_id: params['run_test_id'],
         test_cases: params['test_cases'],
         hide_passed_tests: params['hide_passed_tests'],
