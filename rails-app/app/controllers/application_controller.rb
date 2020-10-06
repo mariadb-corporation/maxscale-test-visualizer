@@ -77,25 +77,27 @@ class ApplicationController < ActionController::Base
 
     result = []
 
-    mariadb_version = filter_field_to_sql(:mariadb_version, selected_filters_values, 'All')
+    mariadb_version = filter_field_to_sql('target_builds.mariadb_version', selected_filters_values, 'All')
     result << mariadb_version unless mariadb_version.empty?
 
-    maxscale_source = filter_field_to_sql(:maxscale_source, selected_filters_values, 'All')
+    maxscale_source = filter_field_to_sql('target_builds.maxscale_source', selected_filters_values, 'All')
     result << maxscale_source unless maxscale_source.empty?
 
-    box = filter_field_to_sql(:box, selected_filters_values, 'All')
+    box = filter_field_to_sql('target_builds.box', selected_filters_values, 'All')
     result << box unless box.empty?
 
-    id = ranges_string_to_sql('id', selected_filters_values[:id])
+    id = ranges_string_to_sql('target_builds.id', selected_filters_values[:id])
     result << id unless id.empty?
 
     jenkins_id = ranges_string_to_sql('test_run.jenkins_id', selected_filters_values[:run_test_id])
     result << jenkins_id unless jenkins_id.empty?
 
-    dbms = field_with_version_to_sql(selected_filters_values[:dbms], 'product', 'mariadb_version', 'All')
+    dbms = field_with_version_to_sql(selected_filters_values[:dbms], 'target_builds.product',
+                                     'target_builds.mariadb_version', 'All')
     result << "(#{dbms})" unless dbms.empty?
 
-    test_tool = field_with_version_to_sql(selected_filters_values[:test_tool], 'test_tool', 'test_tool_version', 'All')
+    test_tool = field_with_version_to_sql(selected_filters_values[:test_tool], 'target_builds.test_tool',
+                                          'target_builds.test_tool_version', 'All')
     result << "(#{test_tool})" unless test_tool.empty?
 
     maxscale_threads = filter_field_to_sql(:maxscale_threads, selected_filters_values, 'All')
