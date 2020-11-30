@@ -115,7 +115,7 @@ class ApplicationController < ActionController::Base
     if selected_filters_values[:time_interval_dropdown] > 0
       time_interval_finish = model.last_date
       time_interval_start = model.last_date - selected_filters_values[:time_interval_dropdown].days
-      result << time_interval_to_sql('start_time', time_interval_start, time_interval_finish)
+      result << time_interval_to_sql('target_builds.start_time', time_interval_start, time_interval_finish)
     elsif selected_filters_values[:time_interval_dropdown] == -2 &&
           !selected_filters_values[:time_interval_start].nil? &&
           !selected_filters_values[:time_interval_finish].nil?
@@ -124,7 +124,7 @@ class ApplicationController < ActionController::Base
       time_interval_start = selected_filters_values[:time_interval_start] unless selected_filters_values[:time_interval_start].empty?
       time_interval_finish = selected_filters_values[:time_interval_finish] unless selected_filters_values[:time_interval_finish].empty?
 
-      result << time_interval_to_sql('start_time',
+      result << time_interval_to_sql('target_builds.start_time',
                                      time_interval_start,
                                      time_interval_finish)
     end
